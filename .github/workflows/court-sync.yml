@@ -1,0 +1,49 @@
+name: Court diary sync
+
+# Pulls the P&H High Court cause lists, finds your matters, writes
+# docs/data.json + docs/diary.ics + docs/causelist.txt, and commits them.
+# Runs twice a day in IST: ~06:15 and ~19:45. Also runnable by hand.
+
+on:
+  schedule:
+    - cron: "45 0 * * *"    # 06:15 IST
+    - cron: "15 14 * * *"   # 19:45 IST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: court-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Get the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PyMuPDF
+        run: pip install --quiet pymupdf
+
+      - name: Pull cause lists and match my cases
+        run: python court_sync.py --days 3
+
+      - name: Commit the results
+        run: |
+          git config user.name  "court-diary-sync"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/data.json docs/diary.ics docs/causelist.txt
+          if git diff --staged --quiet; then
+            echo "Nothing changed since the last run."
+          else
+            git commit -m "cause list sync $(date -u +%F)"
+            git push
+          fi
