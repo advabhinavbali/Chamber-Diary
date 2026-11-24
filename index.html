@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#faf7f3">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chamber Diary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2322405f'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='26' font-weight='bold' fill='%23faf7f3' text-anchor='middle'%3ECD%3C/text%3E%3C/svg%3E">
+<title>Chamber Diary — Case &amp; Cause List Manager</title>
+<style>
+:root{
+  --paper:#faf7f3;
+  --surface:#fffefc;
+  --surface-2:#f4efe8;
+  --ink:#231f1c;
+  --ink-2:#5b524a;
+  --ink-3:#8c8177;
+  --line:rgba(35,31,28,.12);
+  --line-2:rgba(35,31,28,.24);
+  --terra:#b4421f;
+  --terra-soft:rgba(180,66,31,.10);
+  --sage:#5b7a3a;
+  --sage-soft:rgba(91,122,58,.12);
+  --navy:#22405f;
+  --navy-soft:rgba(34,64,95,.10);
+  --gold:#96702a;
+  --gold-soft:rgba(150,112,42,.13);
+  --danger:#a02a1e;
+  --radius:10px;
+  --shadow:0 1px 2px rgba(35,31,28,.05), 0 8px 24px -18px rgba(35,31,28,.35);
+  --font-ui:"Avenir Next","Segoe UI","Trebuchet MS",Corbel,sans-serif;
+  --font-head:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --font-mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#171412;
+    --surface:#1f1b18;
+    --surface-2:#26211d;
+    --ink:#efe8e0;
+    --ink-2:#b8ada2;
+    --ink-3:#8b8177;
+    --line:rgba(239,232,224,.12);
+    --line-2:rgba(239,232,224,.24);
+    --terra:#e0704a;
+    --terra-soft:rgba(224,112,74,.14);
+    --sage:#9cb877;
+    --sage-soft:rgba(156,184,119,.14);
+    --navy:#8fb3d6;
+    --navy-soft:rgba(143,179,214,.13);
+    --gold:#d5ae62;
+    --gold-soft:rgba(213,174,98,.14);
+    --danger:#e2776a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -18px rgba(0,0,0,.8);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 600px at 85% -10%, var(--terra-soft), transparent 60%),
+    radial-gradient(900px 500px at -10% 100%, var(--sage-soft), transparent 55%),
+    var(--paper);
+  background-attachment:fixed;
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{font-family:var(--font-head);font-weight:600;letter-spacing:-.01em;margin:0}
+a{color:var(--navy)}
+button{font-family:inherit;font-size:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:inherit;color:var(--ink)}
+::selection{background:var(--terra-soft)}
+
+/* ---------- shell ---------- */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:236px;flex:0 0 236px;border-right:1px solid var(--line);
+  background:linear-gradient(180deg,var(--surface),var(--surface-2));
+  padding:22px 16px 18px;display:flex;flex-direction:column;gap:18px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.brand{display:flex;gap:10px;align-items:flex-start}
+.brand__mark{
+  width:34px;height:34px;flex:0 0 34px;border-radius:8px;
+  background:var(--navy);color:#fff;display:grid;place-items:center;
+  font-family:var(--font-head);font-size:17px;letter-spacing:.02em;
+}
+.brand__name{font-family:var(--font-head);font-size:16.5px;line-height:1.15}
+.brand__sub{font-size:11px;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav__item{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 11px;border-radius:8px;border:1px solid transparent;
+  background:none;color:var(--ink-2);text-align:left;font-size:14px;
+}
+.nav__item:hover{background:var(--surface-2);color:var(--ink)}
+.nav__item.is-on{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:var(--shadow);font-weight:600}
+.nav__count{
+  font-family:var(--font-mono);font-size:11px;color:var(--ink-3);
+  background:var(--surface-2);border-radius:20px;padding:1px 7px;min-width:22px;text-align:center;
+}
+.nav__item.is-on .nav__count{background:var(--terra-soft);color:var(--terra)}
+.side-foot{margin-top:auto;font-size:11.5px;color:var(--ink-3);line-height:1.6}
+.side-foot b{color:var(--ink-2);font-weight:600}
+
+main{flex:1;min-width:0;padding:26px 30px 60px;max-width:1180px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.page-title{font-size:27px;line-height:1.15}
+.page-sub{color:var(--ink-3);font-size:13px;margin-top:4px}
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra)}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ---------- controls ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:8px;
+  border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
+  font-size:13.5px;line-height:1.2;transition:.12s;
+}
+.btn:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn--primary{background:var(--terra);border-color:var(--terra);color:#fff;font-weight:600}
+.btn--primary:hover{background:#9d3819;border-color:#9d3819}
+.btn--ghost{background:transparent;border-color:var(--line)}
+.btn--ghost:hover{background:var(--surface-2)}
+.btn--sm{padding:4px 9px;font-size:12px;border-radius:6px}
+.btn--danger{color:var(--danger);border-color:rgba(160,42,30,.35)}
+.btn--danger:hover{background:rgba(160,42,30,.07);border-color:var(--danger)}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field > label{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.field input,.field select,.field textarea{
+  width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--line-2);
+  background:var(--surface);font-size:14px;
+}
+.field textarea{min-height:76px;resize:vertical;line-height:1.5}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--terra);box-shadow:0 0 0 3px var(--terra-soft);
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.span-2{grid-column:span 2}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.toolbar .field{flex:0 0 auto}
+.toolbar .field--grow{flex:1 1 200px}
+
+/* ---------- cards / stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:13px 15px;box-shadow:var(--shadow);
+}
+.stat__n{font-family:var(--font-head);font-size:30px;line-height:1;letter-spacing:-.02em}
+.stat__l{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+.stat--hero{background:linear-gradient(160deg,var(--terra-soft),var(--surface));border-color:rgba(180,66,31,.28)}
+.stat--hero .stat__n{color:var(--terra)}
+.stat--warn .stat__n{color:var(--gold)}
+.stat--alert .stat__n{color:var(--danger)}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;
+}
+.card__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 15px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--surface),var(--surface-2));
+}
+.card__head h3{font-size:15px}
+.card__body{padding:14px 15px}
+.card__body--flush{padding:0}
+.section-label{
+  display:flex;align-items:center;gap:7px;font-family:var(--font-mono);
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 9px;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--terra);display:inline-block}
+.dot--sage{background:var(--sage)}
+.dot--navy{background:var(--navy)}
+.dot--gold{background:var(--gold)}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+table.tbl th{
+  text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:600;padding:9px 12px;border-bottom:1px solid var(--line-2);
+  background:var(--surface-2);white-space:nowrap;
+}
+table.tbl td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl tbody tr:hover{background:var(--surface-2)}
+td.num,th.num{font-family:var(--font-mono);font-size:12px;white-space:nowrap}
+.case-title{font-weight:600;line-height:1.35}
+.case-meta{font-size:12px;color:var(--ink-3);margin-top:2px}
+.mono{font-family:var(--font-mono);font-size:12px}
+.nowrap{white-space:nowrap}
+
+/* ---------- badges ---------- */
+.badge{
+  display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;
+  border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface-2);white-space:nowrap;
+}
+.badge--terra{color:var(--terra);border-color:rgba(180,66,31,.35);background:var(--terra-soft)}
+.badge--sage{color:var(--sage);border-color:rgba(91,122,58,.35);background:var(--sage-soft)}
+.badge--navy{color:var(--navy);border-color:rgba(34,64,95,.3);background:var(--navy-soft)}
+.badge--gold{color:var(--gold);border-color:rgba(150,112,42,.35);background:var(--gold-soft)}
+.badge--danger{color:var(--danger);border-color:rgba(160,42,30,.35);background:rgba(160,42,30,.08)}
+.tag{font-size:11px;padding:1px 7px;border-radius:5px;background:var(--sage-soft);color:var(--sage);border:1px solid rgba(91,122,58,.25);white-space:nowrap}
+
+/* ---------- cause list ---------- */
+.court-block{margin-bottom:6px}
+.court-block__head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:10px 15px;background:var(--navy-soft);border-bottom:1px solid var(--line);
+}
+.court-block__name{font-family:var(--font-head);font-size:15px;color:var(--navy)}
+.court-block__count{font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
+.empty{padding:34px 20px;text-align:center;color:var(--ink-3);font-size:13.5px}
+.empty b{display:block;font-family:var(--font-head);font-size:17px;color:var(--ink-2);margin-bottom:6px}
+
+/* ---------- case detail ---------- */
+.detail-head{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;
+  border-top:3px solid var(--terra);
+}
+.detail-title{font-size:22px;line-height:1.25}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px}
+.meta-item .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.meta-item .v{font-size:13.5px;margin-top:2px;overflow-wrap:anywhere}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px;flex-wrap:wrap}
+.tab{
+  padding:8px 13px;border:none;background:none;color:var(--ink-3);font-size:13.5px;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+}
+.tab:hover{color:var(--ink)}
+.tab.is-on{color:var(--terra);border-bottom-color:var(--terra);font-weight:600}
+.tab__n{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:4px}
+
+.timeline{list-style:none;margin:0;padding:0}
+.timeline li{position:relative;padding:0 0 18px 22px;border-left:1px solid var(--line-2);margin-left:5px}
+.timeline li:last-child{border-left-color:transparent;padding-bottom:0}
+.timeline li::before{
+  content:"";position:absolute;left:-4.5px;top:5px;width:8px;height:8px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--sage);
+}
+.tl-date{font-family:var(--font-mono);font-size:11.5px;color:var(--sage);letter-spacing:.03em}
+.tl-body{margin-top:3px;font-size:13.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.tl-next{font-size:12.5px;color:var(--ink-3);margin-top:5px}
+.tl-actions{display:flex;gap:6px;margin-top:6px;opacity:.55;transition:.12s}
+.timeline li:hover .tl-actions{opacity:1}
+
+.order-row{
+  display:flex;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line);
+}
+.order-row:last-child{border-bottom:none}
+.order-row.is-unread{background:var(--gold-soft)}
+.order-body{flex:1;min-width:0}
+.order-top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.order-date{font-family:var(--font-mono);font-size:12px;color:var(--gold);font-weight:600}
+.order-text{font-size:13.5px;margin-top:5px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink-2)}
+.order-text--clamped{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.order-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+
+.note{
+  border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-bottom:10px;
+  background:var(--surface-2);font-size:13.5px;
+}
+.note.is-pinned{border-left:3px solid var(--terra);background:var(--terra-soft)}
+.note__text{white-space:pre-wrap;overflow-wrap:anywhere}
+.note__foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;font-size:11.5px;color:var(--ink-3)}
+.note__foot .acts{display:flex;gap:6px}
+
+/* ---------- modal ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(20,16,14,.45);backdrop-filter:blur(2px);
+  display:flex;align-items:flex-start;justify-content:center;padding:26px 16px;z-index:50;overflow-y:auto;
+}
+.modal{
+  background:var(--surface);border-radius:14px;border:1px solid var(--line-2);
+  width:100%;max-width:640px;box-shadow:0 30px 80px -30px rgba(0,0,0,.5);
+  animation:pop .16s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.modal{animation:none}.btn:hover{transform:none}}
+.modal__head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.modal__head h3{font-size:17px}
+.modal__body{padding:18px;display:flex;flex-direction:column;gap:12px}
+.modal__foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 18px;border-top:1px solid var(--line);background:var(--surface-2);border-radius:0 0 14px 14px;flex-wrap:wrap}
+.x{border:none;background:none;font-size:20px;line-height:1;color:var(--ink-3);padding:2px 6px;border-radius:6px}
+.x:hover{background:var(--surface-2);color:var(--ink)}
+.hint{font-size:12px;color:var(--ink-3);line-height:1.5}
+
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:24px;
+  font-size:13px;z-index:80;box-shadow:0 10px 30px -10px rgba(0,0,0,.6);animation:pop .16s ease-out;
+}
+
+/* ---------- print ---------- */
+#print-area{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  .app,.overlay,.toast{display:none !important}
+  #print-area{display:block !important}
+  @page{size:A4;margin:14mm 12mm}
+  #print-area *{color:#000 !important}
+  .pr-sheet{font-family:"Times New Roman",Georgia,serif;font-size:11pt}
+  .pr-head{text-align:center;border-bottom:1.5pt solid #000;padding-bottom:6pt;margin-bottom:10pt}
+  .pr-head h2{margin:0;font-size:13pt;letter-spacing:.02em}
+  .pr-head .sub{font-size:9.5pt;margin-top:3pt}
+  .pr-court{font-weight:bold;font-size:11pt;margin:12pt 0 5pt;border-bottom:.75pt solid #000;padding-bottom:2pt;page-break-after:avoid}
+  table.pr{width:100%;border-collapse:collapse;font-size:9.5pt}
+  table.pr th{border:.75pt solid #000;padding:3pt 4pt;text-align:left;font-size:9pt}
+  table.pr td{border:.75pt solid #000;padding:4pt;vertical-align:top}
+  table.pr td.note{width:26%}
+  .pr-blank{height:9pt}
+  .pr-foot{margin-top:14pt;font-size:9pt;display:flex;justify-content:space-between}
+  .pr-brief{font-family:"Times New Roman",Georgia,serif;font-size:12pt;line-height:1.9}
+  .pr-brief .center{text-align:center}
+  .pr-brief .b{font-weight:bold}
+  .pr-brief .rule{border-top:.75pt solid #000;margin:10pt 0}
+  .pr-brief .indent{margin-left:38%}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:920px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  main{padding:20px 16px 80px}
+}
+@media (max-width:760px){
+  /* let wide tables scroll instead of crushing their columns */
+  .tbl-wrap table.tbl{min-width:620px}
+  .tbl-wrap{ -webkit-overflow-scrolling:touch }
+  .card__head{flex-wrap:wrap}
+  .app{flex-direction:column}
+  .sidebar{
+    width:auto;flex:none;height:auto;position:sticky;top:0;z-index:30;
+    border-right:none;border-bottom:1px solid var(--line);padding:12px 14px;gap:10px;
+  }
+  .brand__sub{display:none}
+  .nav{flex-direction:row;overflow-x:auto;gap:4px;padding-bottom:2px}
+  .nav__item{white-space:nowrap;padding:7px 10px}
+  .side-foot{display:none}
+  .page-title{font-size:22px}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .span-2{grid-column:auto}
+  .detail-title{font-size:19px}
+  .toolbar .field,.toolbar .field--grow{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand__mark">CD</div>
+      <div>
+        <div class="brand__name" id="brandName">Chamber Diary</div>
+        <div class="brand__sub">Case &amp; Cause List</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav__item" data-nav="today">Today <span class="nav__count" id="cntToday">0</span></button>
+      <button class="nav__item" data-nav="cause">Cause list <span class="nav__count" id="cntWeek">0</span></button>
+      <button class="nav__item" data-nav="cases">Cases <span class="nav__count" id="cntCases">0</span></button>
+      <button class="nav__item" data-nav="schedule">Schedule</button>
+      <button class="nav__item" data-nav="tasks">To do <span class="nav__count" id="cntTasks">0</span></button>
+      <button class="nav__item" data-nav="alerts">Alerts <span class="nav__count" id="cntAlerts">0</span></button>
+      <button class="nav__item" data-nav="orders">Orders <span class="nav__count" id="cntOrders">0</span></button>
+      <button class="nav__item" data-nav="clients">Clients</button>
+      <button class="nav__item" data-nav="money">Fees</button>
+      <button class="nav__item" data-nav="settings">Settings</button>
+    </nav>
+    <div class="side-foot">
+      <div><b>All data stays on this device.</b></div>
+      <div>Back up from Settings → Backup. Nothing is uploaded anywhere.</div>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="print-area"></div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   Chamber Diary — offline case & cause list manager
+   Data lives in localStorage on this device only.
+   ========================================================= */
+
+const STORE_KEY = "chamberDiary.v1";
+const DEFAULT_COURTS = [
+  "Punjab & Haryana High Court",
+  "District Court, Mohali",
+  "Judicial Complex, Dera Bassi",
+  "DRT-I, Chandigarh",
+  "DRT-II, Chandigarh",
+  "DRT-III, Chandigarh",
+  "Supreme Court of India",
+  "District Consumer Commission, Chandigarh",
+  "RERA Punjab",
+  "NCDRC, New Delhi"
+];
+
+let db = null;
+let courtSync = null;      // data.json written by court_sync.py
+let courtSyncNote = "";   // status line for Settings
+let ui = { route: "today", causeDate: null, causeCourt: "", causeTag: "", q: "", courtFilter: "", statusFilter: "active", tab: "diary", showAllOrders: false, taskFilter: "open" };
+
+/* ---------------- utilities ---------------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function uid() {
+  try { return crypto.randomUUID(); }
+  catch (e) { return "id" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+}
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function isoAdd(iso, days) {
+  const p = String(iso || todayISO()).split("-").map(Number);
+  const d = new Date(p[0], p[1] - 1, p[2]);
+  d.setDate(d.getDate() + days);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAY = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+function fmtDate(iso) {
+  if (!iso) return "—";
+  const p = String(iso).split("-").map(Number);
+  if (p.length !== 3 || !p[0]) return esc(iso);
+  return p[2] + " " + MON[p[1] - 1] + " " + p[0];
+}
+function fmtDateShort(iso) {
+  if (!iso) return "—";
+  const p = String(iso).split("-").map(Number);
+  if (p.length !== 3 || !p[0]) return esc(iso);
+  return p[2] + " " + MON[p[1] - 1];
+}
+function dayName(iso) {
+  const p = String(iso).split("-").map(Number);
+  if (p.length !== 3) return "";
+  return DAY[new Date(p[0], p[1] - 1, p[2]).getDay()];
+}
+function relDays(iso) {
+  if (!iso) return null;
+  const a = new Date(todayISO() + "T00:00:00");
+  const b = new Date(iso + "T00:00:00");
+  return Math.round((b - a) / 86400000);
+}
+function relLabel(iso) {
+  const n = relDays(iso);
+  if (n === null) return "";
+  if (n === 0) return "Today";
+  if (n === 1) return "Tomorrow";
+  if (n === -1) return "Yesterday";
+  if (n > 1) return "in " + n + " days";
+  return Math.abs(n) + " days ago";
+}
+function toast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+function splitTags(s) {
+  return String(s || "").split(",").map(x => x.trim()).filter(Boolean);
+}
+function caseTitle(c) {
+  const a = (c.client || "Client").trim();
+  const b = (c.opposite || "").trim();
+  return b ? a + " v. " + b : a;
+}
+function sortByDateThenCourt(a, b) {
+  const da = a.nextDate || "9999-12-31", dbb = b.nextDate || "9999-12-31";
+  if (da !== dbb) return da < dbb ? -1 : 1;
+  if ((a.court || "") !== (b.court || "")) return (a.court || "") < (b.court || "") ? -1 : 1;
+  return caseTitle(a).localeCompare(caseTitle(b));
+}
+
+/* ---------------- persistence ---------------- */
+function blankDB() {
+  return {
+    version: 1,
+    settings: {
+      advocate: { name: "", enrolment: "", chamber: "", phone: "" },
+      courts: DEFAULT_COURTS.slice()
+    },
+    cases: [],
+    createdAt: new Date().toISOString()
+  };
+}
+function load() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORE_KEY); } catch (e) { raw = null; }
+  if (!raw) { db = blankDB(); save(); return; }
+  try {
+    const parsed = JSON.parse(raw);
+    db = Object.assign(blankDB(), parsed);
+    db.settings = Object.assign(blankDB().settings, parsed.settings || {});
+    if (!Array.isArray(db.settings.courts) || !db.settings.courts.length) db.settings.courts = DEFAULT_COURTS.slice();
+    if (!Array.isArray(db.cases)) db.cases = [];
+    db.cases.forEach(normaliseCase);
+  } catch (e) {
+    db = blankDB();
+    toast("Could not read saved data — starting fresh.");
+  }
+}
+function normaliseCase(c) {
+  c.id = c.id || uid();
+  ["client","opposite","court","room","caseNo","cnr","stage","ourSide","nextDate","status","feeNotes","clientPhone","clientEmail","courtNote"].forEach(k => { if (c[k] == null) c[k] = ""; });
+  if (!c.status) c.status = "active";
+  if (!Array.isArray(c.tags)) c.tags = [];
+  if (!Array.isArray(c.hearings)) c.hearings = [];
+  if (!Array.isArray(c.orders)) c.orders = [];
+  if (!Array.isArray(c.notes)) c.notes = [];
+  if (!Array.isArray(c.tasks)) c.tasks = [];
+  if (!Array.isArray(c.docs)) c.docs = [];
+  if (!Array.isArray(c.fees)) c.fees = [];
+  return c;
+}
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(db));
+  } catch (e) {
+    toast("Storage full — export a backup from Settings.");
+  }
+}
+function getCase(id) { return db.cases.find(c => c.id === id) || null; }
+function upsertCase(c) {
+  const i = db.cases.findIndex(x => x.id === c.id);
+  if (i === -1) db.cases.push(normaliseCase(c));
+  else db.cases[i] = normaliseCase(c);
+  save();
+}
+
+/* ---------------- queries ---------------- */
+function activeCases() { return db.cases.filter(c => c.status !== "disposed"); }
+function casesOn(iso) {
+  return activeCases().filter(c => c.nextDate === iso).sort(sortByDateThenCourt);
+}
+function upcoming(limitDays) {
+  const end = isoAdd(todayISO(), limitDays);
+  return activeCases()
+    .filter(c => c.nextDate && c.nextDate >= todayISO() && c.nextDate <= end)
+    .sort(sortByDateThenCourt);
+}
+function overdue() {
+  return activeCases().filter(c => c.nextDate && c.nextDate < todayISO()).sort(sortByDateThenCourt);
+}
+function allOrders() {
+  const out = [];
+  db.cases.forEach(c => (c.orders || []).forEach(o => out.push({ c, o })));
+  return out.sort((a, b) => (b.o.date || "").localeCompare(a.o.date || ""));
+}
+function unreadOrders() { return allOrders().filter(x => !x.o.read); }
+function allTags() {
+  const s = new Set();
+  db.cases.forEach(c => (c.tags || []).forEach(t => s.add(t)));
+  return Array.from(s).sort();
+}
+function courtCountsFor(iso) {
+  const map = new Map();
+  casesOn(iso).forEach(c => {
+    const k = c.court || "Court not set";
+    map.set(k, (map.get(k) || 0) + 1);
+  });
+  return map;
+}
+
+/* ---------------- routing ---------------- */
+function go(route, opts) {
+  ui.route = route;
+  if (opts) Object.assign(ui, opts);
+  if (location.hash !== "#/" + route) {
+    try { history.replaceState(null, "", "#/" + route); } catch (e) {}
+  }
+  render();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+function parseHash() {
+  const h = (location.hash || "").replace(/^#\/?/, "");
+  if (!h) return { route: "today" };
+  const parts = h.split("/");
+  if (parts[0] === "case" && parts[1]) return { route: "case", id: parts[1] };
+  const known = ["today","cause","cases","orders","settings","tasks","alerts","schedule","clients","money"];
+  if (known.indexOf(parts[0]) !== -1) return { route: parts[0] };
+  return { route: "today" };
+}
+
+/* ---------------- render ---------------- */
+function render() {
+  const main = $("#main");
+  $$("#nav .nav__item").forEach(b => {
+    const r = b.getAttribute("data-nav");
+    b.classList.toggle("is-on", r === ui.route || (ui.route === "case" && r === "cases"));
+  });
+  updateCounts();
+  if (ui.route === "today") main.innerHTML = viewToday();
+  else if (ui.route === "cause") main.innerHTML = viewCause();
+  else if (ui.route === "cases") main.innerHTML = viewCases();
+  else if (ui.route === "case") main.innerHTML = viewCaseDetail();
+  else if (ui.route === "orders") main.innerHTML = viewOrders();
+  else if (ui.route === "tasks") main.innerHTML = viewTasks();
+  else if (ui.route === "alerts") main.innerHTML = viewAlerts();
+  else if (ui.route === "schedule") main.innerHTML = viewSchedule();
+  else if (ui.route === "clients") main.innerHTML = viewClients();
+  else if (ui.route === "money") main.innerHTML = viewMoney();
+  else main.innerHTML = viewSettings();
+}
+/* ---------- court sync (optional: data.json next to the app) ---------- */
+function normKey(s) { return String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
+async function loadCourtSync() {
+  if (location.protocol.indexOf("http") !== 0) { courtSyncNote = "Local file — no court sync"; return; }
+  try {
+    const r = await fetch("data.json", { cache: "no-store" });
+    if (!r.ok) throw new Error("http " + r.status);
+    const j = await r.json();
+    if (!j || !Array.isArray(j.matches)) throw new Error("bad file");
+    courtSync = j;
+    courtSyncNote = (j.matches.length || 0) + " listing(s) · updated " + String(j.generated_at || "").slice(0, 16).replace("T", " ");
+    if (ui.route === "today" || ui.route === "case") render();
+  } catch (e) {
+    courtSync = null;
+    courtSyncNote = "No court data yet — run the daily sync";
+  }
+}
+function syncTokens(m) {
+  const out = [];
+  if (m.case_label) out.push(normKey(m.case_label));
+  if (m.case_no_in_list) String(m.case_no_in_list).split(",").forEach(x => out.push(normKey(x)));
+  return out.filter(Boolean);
+}
+function syncFor(c) {
+  if (!courtSync || !Array.isArray(courtSync.matches)) return [];
+  const keys = [normKey(c.caseNo)].filter(Boolean);
+  return courtSync.matches.filter(m => {
+    if (m.case_id && c.syncId && m.case_id === c.syncId) return true;
+    const t = syncTokens(m);
+    if (keys.length && keys.some(k => t.indexOf(k) !== -1)) return true;
+    if (!c.caseNo && c.client) {
+      const blob = (m.parties || "").toUpperCase();
+      const w = String(c.client).toUpperCase().split(/[^A-Z]+/).filter(x => x.length >= 4);
+      if (w.length && w.every(x => blob.indexOf(x) !== -1)) return true;
+    }
+    return false;
+  });
+}
+function upcomingSync() {
+  if (!courtSync || !Array.isArray(courtSync.matches)) return [];
+  return courtSync.matches.filter(m => m.date >= todayISO()).sort((a, b) => (a.date + String(a.item).padStart(4, "0")).localeCompare(b.date + String(b.item).padStart(4, "0")));
+}
+
+/* ================= documents: real files in IndexedDB ================= */
+let idb = null;
+let idbBroken = false;
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    if (idb) return resolve(idb);
+    if (idbBroken || !window.indexedDB) return reject(new Error("no-indexeddb"));
+    let req;
+    try { req = indexedDB.open("chamberDiaryFiles", 1); }
+    catch (e) { idbBroken = true; return reject(e); }
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if (!d.objectStoreNames.contains("files")) d.createObjectStore("files", { keyPath: "id" });
+    };
+    req.onsuccess = () => { idb = req.result; resolve(idb); };
+    req.onerror = () => { idbBroken = true; reject(req.error); };
+    req.onblocked = () => { idbBroken = true; reject(new Error("blocked")); };
+  });
+}
+function idbPut(rec) {
+  return idbOpen().then(d => new Promise((res, rej) => {
+    const tx = d.transaction("files", "readwrite");
+    tx.objectStore("files").put(rec);
+    tx.oncomplete = () => res(rec.id);
+    tx.onerror = () => rej(tx.error);
+  }));
+}
+function idbGet(id) {
+  return idbOpen().then(d => new Promise((res, rej) => {
+    const tx = d.transaction("files", "readonly");
+    const rq = tx.objectStore("files").get(id);
+    rq.onsuccess = () => res(rq.result || null);
+    rq.onerror = () => rej(rq.error);
+  }));
+}
+function idbDel(id) {
+  return idbOpen().then(d => new Promise((res) => {
+    const tx = d.transaction("files", "readwrite");
+    tx.objectStore("files").delete(id);
+    tx.oncomplete = () => res(true);
+    tx.onerror = () => res(false);
+  }));
+}
+function idbUsage() {
+  return idbOpen().then(d => new Promise(res => {
+    const tx = d.transaction("files", "readonly");
+    const rq = tx.objectStore("files").getAllKeys();
+    rq.onsuccess = () => res(rq.result.length);
+    rq.onerror = () => res(0);
+  })).catch(() => 0);
+}
+function humanSize(n) {
+  n = Number(n) || 0;
+  if (n < 1024) return n + " B";
+  if (n < 1048576) return (n / 1024).toFixed(0) + " KB";
+  return (n / 1048576).toFixed(1) + " MB";
+}
+const DOC_KINDS = ["Vakalatnama", "Petition / Plaint", "Written statement", "Reply", "Evidence", "Affidavit", "Order", "Judgment", "Application", "Other"];
+
+/* ================= tasks ================= */
+function tasksAll() {
+  const out = [];
+  db.cases.forEach(c => (c.tasks || []).forEach(t => out.push({ c, t })));
+  return out;
+}
+const PRIORITY_RANK = { high: 0, normal: 1, low: 2 };
+function openTasks() {
+  return tasksAll().filter(x => !x.t.done).sort((a, b) => {
+    const da = a.t.due || "9999-12-31", dbb = b.t.due || "9999-12-31";
+    if (da !== dbb) return da < dbb ? -1 : 1;
+    return (PRIORITY_RANK[a.t.priority] || 1) - (PRIORITY_RANK[b.t.priority] || 1);
+  });
+}
+function tasksDueOn(iso) { return openTasks().filter(x => x.t.due === iso); }
+function tasksLate() { return openTasks().filter(x => x.t.due && x.t.due < todayISO()); }
+
+/* ================= fees ================= */
+function feeTotals(c) {
+  let fees = 0, paid = 0;
+  (c.fees || []).forEach(f => {
+    const amt = Number(f.amount) || 0;
+    if (f.kind === "payment") paid += amt; else fees += amt;
+  });
+  return { fees, paid, balance: fees - paid };
+}
+function money(n) {
+  n = Number(n) || 0;
+  return "\u20b9" + n.toLocaleString("en-IN");
+}
+function moneyAll() {
+  let fees = 0, paid = 0;
+  db.cases.forEach(c => { const t = feeTotals(c); fees += t.fees; paid += t.paid; });
+  return { fees, paid, balance: fees - paid };
+}
+
+/* ================= alerts ================= */
+function alertItems() {
+  const out = [];
+  const t = todayISO();
+  overdue().forEach(c => out.push({ kind: "date", level: "high", text: "Date passed — " + caseTitle(c), sub: fmtDate(c.nextDate) + " · " + (c.court || ""), caseId: c.id, date: c.nextDate }));
+  tasksLate().forEach(x => out.push({ kind: "task", level: "high", text: x.t.text, sub: "Overdue · " + fmtDate(x.t.due) + " · " + caseTitle(x.c), caseId: x.c.id, date: x.t.due }));
+  tasksDueOn(t).forEach(x => out.push({ kind: "task", level: "normal", text: x.t.text, sub: "Due today · " + caseTitle(x.c), caseId: x.c.id, date: t }));
+  unreadOrders().forEach(x => out.push({ kind: "order", level: "normal", text: "Order to read — " + caseTitle(x.c), sub: fmtDate(x.o.date) + " · " + (x.o.bench || ""), caseId: x.c.id, date: x.o.date }));
+  casesOn(t).forEach(c => out.push({ kind: "listed", level: "normal", text: "Listed today — " + caseTitle(c), sub: (c.court || "") + (c.room ? " · " + c.room : "") + (c.stage ? " · " + c.stage : ""), caseId: c.id, date: t }));
+  return out.sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+}
+function alertCount() { return alertItems().length; }
+
+function updateCounts() {
+  const c = {
+    cntToday: casesOn(todayISO()).length,
+    cntWeek: upcoming(7).length,
+    cntCases: activeCases().length,
+    cntOrders: unreadOrders().length,
+    cntTasks: openTasks().length,
+    cntAlerts: alertCount()
+  };
+  Object.keys(c).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = c[id]; });
+  const nm = $("#brandName");
+  if (nm) nm.textContent = (db.settings.advocate && db.settings.advocate.name) ? "Chamber Diary" : "Chamber Diary";
+}
+
+/* ---------------- view: today ---------------- */
+function viewToday() {
+  const t = todayISO();
+  const list = casesOn(t);
+  const week = upcoming(7).filter(c => c.nextDate !== t);
+  const late = overdue();
+  const unread = unreadOrders();
+  const weekCount = upcoming(7).length;
+
+  let h = "";
+  h += '<div class="page-head"><div>';
+  h += '<div class="eyebrow">' + esc(dayName(t)) + " · " + fmtDate(t) + '</div>';
+  h += '<h1 class="page-title">' + (list.length ? list.length + " matter" + (list.length > 1 ? "s" : "") + " listed today" : "Nothing listed today") + '</h1>';
+  h += '<div class="page-sub">' + (db.settings.advocate.name ? esc(db.settings.advocate.name) + " · " : "") + "Chamber Diary · " + activeCases().length + " active matters on record</div>";
+  h += '</div><div class="head-actions">';
+  h += '<button class="btn btn--ghost" data-action="print-cause" data-date="' + t + '">Print today\'s list</button>';
+  h += '<button class="btn btn--ghost" data-action="export-ics">Calendar file</button>';
+  h += '<button class="btn btn--primary" data-action="new-case">+ New case</button>';
+  h += '</div></div>';
+
+  h += '<div class="stats">';
+  h += stat(list.length, "Listed today", "stat--hero");
+  h += stat(weekCount, "Next 7 days", "");
+  h += stat(activeCases().length, "Active cases", "");
+  h += stat(late.length, "Date passed / to verify", late.length ? "stat--alert" : "");
+  h += '</div>';
+
+  /* today's work: tasks and alerts */
+  const tDue = tasksDueOn(t), tLate = tasksLate();
+  if (tDue.length || tLate.length || alertCount()) {
+    h += '<div class="card"><div class="card__head"><h3>Work on your desk</h3>';
+    h += '<div class="head-actions"><span class="hint">' + alertCount() + ' alert(s)</span>';
+    h += '<button class="btn btn--sm btn--ghost" data-action="goto-alerts">Alerts</button>';
+    h += '<button class="btn btn--sm btn--ghost" data-action="goto-tasks">All tasks</button></div></div>';
+    h += '<div class="card__body card__body--flush">';
+    if (!tDue.length && !tLate.length) h += '<div class="empty" style="padding:16px">No task due today. <a href="#" data-action="goto-tasks">See what is pending</a>.</div>';
+    tLate.concat(tDue).slice(0, 5).forEach(x => {
+      h += '<div class="order-row"><div class="order-body"><div class="order-text">' + esc(x.t.text) + '</div>';
+      h += '<div class="hint">' + esc(caseTitle(x.c)) + ' · ' + (x.t.due === t ? 'due today' : 'overdue since ' + fmtDate(x.t.due)) + '</div></div>';
+      h += '<div class="order-actions"><button class="btn btn--sm" data-action="toggle-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '">Done</button></div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  /* from the court's own cause list */
+  const fromCourt = upcomingSync();
+  if (fromCourt.length) {
+    h += '<div class="card"><div class="card__head"><h3>From the court\'s cause list</h3>';
+    h += '<span class="hint">' + esc(courtSyncNote) + '</span></div>';
+    h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Item</th><th>Court</th><th>Matter</th><th>Bench</th></tr></thead><tbody>';
+    fromCourt.forEach(m => {
+      const isToday = m.date === todayISO();
+      h += '<tr><td class="num nowrap"' + (isToday ? ' style="color:var(--terra);font-weight:700"' : "") + ">" + fmtDate(m.date) + '</td>';
+      h += '<td class="num">' + esc(String(m.item)) + "</td>";
+      h += '<td class="nowrap">CR NO ' + esc(m.court_no || "—") + "</td>";
+      h += "<td>" + esc(m.case_label || m.case_no_in_list || m.parties || "—") + '<div class="case-meta">' + esc((m.parties || "").slice(0, 90)) + "</div></td>";
+      h += '<td class="hint">' + esc(m.bench || "—") + "</td></tr>";
+    });
+    h += "</tbody></table></div></div></div>";
+  }
+
+  /* today's list */
+  h += '<div class="card"><div class="card__head"><h3>Today before the courts</h3>';
+  h += '<div class="head-actions"><button class="btn btn--sm btn--ghost" data-action="copy-cause" data-date="' + t + '">Copy as text</button>';
+  h += '<button class="btn btn--sm btn--ghost" data-action="goto-cause" data-date="' + t + '">Full cause list</button></div></div>';
+  if (!list.length) {
+    h += '<div class="empty"><b>No matter has today\'s date.</b>Add a case, or record a hearing with a next date and it will appear here on that day.</div>';
+  } else {
+    h += '<div class="card__body card__body--flush">' + causeTableHTML(list, t) + '</div>';
+  }
+  h += '</div>';
+
+  /* next 7 days */
+  if (week.length) {
+    h += '<div class="card"><div class="card__head"><h3>Coming up</h3><span class="hint">' + week.length + " listed in the next seven days</span></div>";
+    h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Court</th><th>Matter</th><th>Stage / purpose</th><th></th></tr></thead><tbody>';
+    week.forEach(c => {
+      h += '<tr><td class="num nowrap">' + fmtDateShort(c.nextDate) + '<div class="case-meta">' + esc(dayName(c.nextDate).slice(0, 3)) + "</div></td>";
+      h += '<td>' + esc(c.court || "—") + (c.room ? '<div class="case-meta">' + esc(c.room) + "</div>" : "") + "</td>";
+      h += '<td><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '" class="case-title">' + esc(caseTitle(c)) + "</a>" + (c.caseNo ? '<div class="case-meta mono">' + esc(c.caseNo) + "</div>" : "") + "</td>";
+      h += '<td>' + esc(c.stage || "—") + "</td>";
+      h += '<td class="nowrap"><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '" data-date="' + esc(c.nextDate) + '">Record</button></td></tr>';
+    });
+    h += "</tbody></table></div></div></div>";
+  }
+
+  /* overdue */
+  if (late.length) {
+    h += '<div class="card"><div class="card__head"><h3 style="color:var(--danger)">Dates already passed</h3><span class="hint">Update these from the court record</span></div>';
+    h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Was listed</th><th>Court</th><th>Matter</th><th></th></tr></thead><tbody>';
+    late.forEach(c => {
+      h += '<tr><td class="num nowrap" style="color:var(--danger)">' + fmtDate(c.nextDate) + '<div class="case-meta">' + relLabel(c.nextDate) + "</div></td>";
+      h += '<td>' + esc(c.court || "—") + "</td>";
+      h += '<td><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '" class="case-title">' + esc(caseTitle(c)) + "</a></td>";
+      h += '<td class="nowrap"><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '" data-date="' + esc(c.nextDate) + '">Update</button></td></tr>';
+    });
+    h += "</tbody></table></div></div></div>";
+  }
+
+  /* unread orders */
+  h += '<div class="card"><div class="card__head"><h3>Orders to read</h3>';
+  h += '<div class="head-actions"><span class="hint">' + unread.length + " unread</span><button class=\"btn btn--sm btn--ghost\" data-action=\"goto-orders\">All orders</button></div></div>";
+  if (!unread.length) {
+    h += '<div class="empty"><b>No unread orders.</b>When an order comes, add it from the case page and tick it off once you have read it.</div>';
+  } else {
+    h += '<div class="card__body card__body--flush">';
+    unread.slice(0, 6).forEach(x => { h += orderRowHTML(x.c, x.o, true); });
+    h += "</div>";
+  }
+  h += "</div>";
+  return h;
+}
+function stat(n, label, cls) {
+  return '<div class="stat ' + (cls || "") + '"><div class="stat__n">' + n + '</div><div class="stat__l">' + esc(label) + "</div></div>";
+}
+
+/* ---------------- cause list table ---------------- */
+function causeTableHTML(list, iso) {
+  const byCourt = new Map();
+  list.forEach(c => {
+    const k = c.court || "Court not set";
+    if (!byCourt.has(k)) byCourt.set(k, []);
+    byCourt.get(k).push(c);
+  });
+  const courts = Array.from(byCourt.keys()).sort();
+  let h = "";
+  courts.forEach(court => {
+    const items = byCourt.get(court);
+    h += '<div class="court-block">';
+    h += '<div class="court-block__head"><span class="court-block__name">' + esc(court) + '</span><span class="court-block__count">' + items.length + " item" + (items.length > 1 ? "s" : "") + "</span></div>";
+    h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34px">#</th><th>Case no. / CNR</th><th>Matter</th><th>Stage / purpose</th><th>Room</th><th></th></tr></thead><tbody>';
+    items.forEach((c, i) => {
+      h += "<tr>";
+      h += '<td class="num">' + (i + 1) + "</td>";
+      h += '<td class="num">' + esc(c.caseNo || "—") + (c.cnr ? '<div class="case-meta">' + esc(c.cnr) + "</div>" : "") + "</td>";
+      h += '<td><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '" class="case-title">' + esc(caseTitle(c)) + "</a>";
+      if (c.tags && c.tags.length) h += '<div class="case-meta">' + c.tags.map(t => '<span class="tag">' + esc(t) + "</span>").join(" ") + "</div>";
+      h += "</td>";
+      h += "<td>" + esc(c.stage || "—") + (c.ourSide ? '<div class="case-meta">' + esc(c.ourSide) + "</div>" : "") + "</td>";
+      h += '<td class="nowrap">' + esc(c.room || "—") + "</td>";
+      h += '<td class="nowrap"><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '" data-date="' + esc(iso) + '">Record</button></td>';
+      h += "</tr>";
+    });
+    h += "</tbody></table></div></div>";
+  });
+  return h;
+}
+
+/* ---------------- view: cause list ---------------- */
+function viewCause() {
+  const iso = ui.causeDate || todayISO();
+  let list = casesOn(iso);
+  if (ui.causeCourt) list = list.filter(c => (c.court || "") === ui.causeCourt);
+  if (ui.causeTag) list = list.filter(c => (c.tags || []).indexOf(ui.causeTag) !== -1);
+
+  let h = "";
+  h += '<div class="page-head"><div>';
+  h += '<div class="eyebrow">Cause list</div>';
+  h += '<h1 class="page-title">' + esc(dayName(iso)) + ", " + fmtDate(iso) + "</h1>";
+  h += '<div class="page-sub">' + list.length + " matter" + (list.length === 1 ? "" : "s") + (ui.causeCourt || ui.causeTag ? " (filtered)" : "") + " · print it, or record each hearing as it is called</div>";
+  h += '</div><div class="head-actions">';
+  h += '<button class="btn btn--ghost" data-action="copy-cause" data-date="' + iso + '">Copy as text</button>';
+  h += '<button class="btn btn--primary" data-action="print-cause" data-date="' + iso + '">Print / PDF</button>';
+  h += "</div></div>";
+
+  h += '<div class="toolbar">';
+  h += '<div class="field"><label>Date</label><input type="date" id="causeDate" value="' + esc(iso) + '" data-change="cause-date"></div>';
+  h += '<div class="field"><label>Court</label><select id="causeCourt" data-change="cause-court"><option value="">All courts</option>';
+  db.settings.courts.forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.causeCourt === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
+  h += "</select></div>";
+  const tags = allTags();
+  if (tags.length) {
+    h += '<div class="field"><label>Tag</label><select data-change="cause-tag"><option value="">All tags</option>';
+    tags.forEach(t => { h += '<option value="' + esc(t) + '"' + (ui.causeTag === t ? " selected" : "") + ">" + esc(t) + "</option>"; });
+    h += "</select></div>";
+  }
+  h += '<div class="field"><label>&nbsp;</label><button class="btn btn--ghost" data-action="cause-today">Today</button></div>';
+  h += '<div class="field"><label>&nbsp;</label><button class="btn btn--ghost" data-action="cause-tomorrow">Tomorrow</button></div>';
+  h += "</div>";
+
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  h += list.length ? causeTableHTML(list, iso) : '<div class="empty"><b>Nothing on this date.</b>Pick another date, or add a hearing with this next date from a case page.</div>';
+  h += "</div></div>";
+  return h;
+}
+
+/* ---------------- view: cases ---------------- */
+function viewCases() {
+  let list = db.cases.slice();
+  if (ui.statusFilter === "active") list = list.filter(c => c.status !== "disposed");
+  else if (ui.statusFilter === "disposed") list = list.filter(c => c.status === "disposed");
+  if (ui.courtFilter) list = list.filter(c => (c.court || "") === ui.courtFilter);
+  if (ui.q) {
+    const q = ui.q.toLowerCase();
+    list = list.filter(c => [caseTitle(c), c.caseNo, c.cnr, c.court, c.stage, (c.tags || []).join(" "), c.client, c.opposite, c.clientPhone]
+      .join(" ").toLowerCase().indexOf(q) !== -1);
+  }
+  list.sort(sortByDateThenCourt);
+
+  let h = "";
+  h += '<div class="page-head"><div><div class="eyebrow">Case register</div>';
+  h += '<h1 class="page-title">' + list.length + " case" + (list.length === 1 ? "" : "s") + "</h1>";
+  h += '<div class="page-sub">' + activeCases().length + " active · " + (db.cases.length - activeCases().length) + " disposed / archived</div></div>";
+  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="export-csv">Export CSV</button>';
+  h += '<button class="btn btn--primary" data-action="new-case">+ New case</button></div></div>';
+
+  h += '<div class="toolbar">';
+  h += '<div class="field field--grow"><label>Search</label><input type="search" id="caseSearch" placeholder="Party, case number, CNR, tag…" value="' + esc(ui.q) + '" data-input="search"></div>';
+  h += '<div class="field"><label>Court</label><select data-change="court-filter"><option value="">All courts</option>';
+  db.settings.courts.forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.courtFilter === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
+  h += "</select></div>";
+  h += '<div class="field"><label>Show</label><select data-change="status-filter">';
+  h += '<option value="active"' + (ui.statusFilter === "active" ? " selected" : "") + ">Active only</option>";
+  h += '<option value="disposed"' + (ui.statusFilter === "disposed" ? " selected" : "") + ">Disposed only</option>";
+  h += '<option value="all"' + (ui.statusFilter === "all" ? " selected" : "") + ">All cases</option>";
+  h += "</select></div></div>";
+
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  if (!list.length) {
+    h += '<div class="empty"><b>' + (db.cases.length ? "No case matches this filter." : "No cases yet.") + "</b>";
+    h += (db.cases.length ? "Clear the search or change the filters." : "Add your first case — you can also import a list from CSV in Settings.");
+    if (!db.cases.length) h += '<div style="margin-top:14px"><button class="btn btn--primary" data-action="new-case">+ Add first case</button> <button class="btn btn--ghost" data-action="load-sample">Load 3 sample cases</button></div>';
+    h += "</div>";
+  } else {
+    h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Matter</th><th>Court</th><th>Next date</th><th>Stage</th><th>Status</th><th></th></tr></thead><tbody>';
+    list.forEach(c => {
+      const n = relDays(c.nextDate);
+      let dateCell = '<span class="case-meta">Not dated</span>';
+      if (c.nextDate) {
+        let style = "";
+        if (c.status !== "disposed" && n !== null) {
+          if (n < 0) style = ' style="color:var(--danger)"';
+          else if (n === 0) style = ' style="color:var(--terra);font-weight:700"';
+        }
+        dateCell = '<span class="num nowrap"' + style + ">" + fmtDate(c.nextDate) + '</span><div class="case-meta">' + esc(relLabel(c.nextDate)) + "</div>";
+      }
+      h += "<tr>";
+      h += '<td><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '" class="case-title">' + esc(caseTitle(c)) + "</a>";
+      h += c.caseNo ? '<div class="case-meta mono">' + esc(c.caseNo) + "</div>" : "";
+      if (c.tags && c.tags.length) h += '<div class="case-meta">' + c.tags.map(t => '<span class="tag">' + esc(t) + "</span>").join(" ") + "</div>";
+      h += "</td>";
+      h += "<td>" + esc(c.court || "—") + (c.room ? '<div class="case-meta">' + esc(c.room) + "</div>" : "") + "</td>";
+      h += "<td>" + dateCell + "</td>";
+      h += "<td>" + esc(c.stage || "—") + "</td>";
+      h += '<td><span class="badge ' + (c.status === "disposed" ? "badge--sage" : "badge--navy") + '">' + (c.status === "disposed" ? "Disposed" : "Active") + "</span></td>";
+      h += '<td class="nowrap"><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '">Record</button> ';
+      h += '<button class="btn btn--sm btn--ghost" data-action="edit-case" data-id="' + esc(c.id) + '">Edit</button></td>';
+      h += "</tr>";
+    });
+    h += "</tbody></table></div>";
+  }
+  h += "</div></div>";
+  return h;
+}
+
+/* ---------------- view: case detail ---------------- */
+function viewCaseDetail() {
+  const c = getCase(ui.caseId);
+  if (!c) return '<div class="empty"><b>Case not found.</b>It may have been deleted. <a href="#/cases" data-action="goto-cases">Back to cases</a></div>';
+  const hearings = (c.hearings || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const orders = (c.orders || []).slice().sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+  const notes = (c.notes || []).slice().sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (b.createdAt || "").localeCompare(a.createdAt || ""));
+
+  let h = '<div style="margin-bottom:12px"><a href="#/cases" data-action="goto-cases" class="hint" style="text-decoration:none">← All cases</a></div>';
+  h += '<div class="detail-head">';
+  h += '<div style="display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start">';
+  h += "<div style=\"min-width:0\">";
+  h += '<div class="eyebrow">' + esc(c.court || "Court not set") + (c.room ? " · " + esc(c.room) : "") + "</div>";
+  h += '<h1 class="detail-title">' + esc(caseTitle(c)) + "</h1>";
+  h += '<div class="page-sub">' + esc(c.caseNo || "Case number not set") + (c.cnr ? " · CNR " + esc(c.cnr) : "") + "</div>";
+  h += "</div>";
+  h += '<div class="head-actions">';
+  h += '<button class="btn btn--primary" data-action="record-hearing" data-id="' + esc(c.id) + '">+ Record hearing</button>';
+  h += '<button class="btn btn--ghost" data-action="edit-case" data-id="' + esc(c.id) + '">Edit</button>';
+  h += '<button class="btn btn--ghost" data-action="print-brief" data-id="' + esc(c.id) + '">Print brief top</button>';
+  h += "</div></div>";
+
+  h += '<div class="meta-grid">';
+  h += meta("Next date", c.nextDate ? fmtDate(c.nextDate) + " (" + relLabel(c.nextDate) + ")" : "Not dated");
+  h += meta("Stage / purpose", c.stage || "—");
+  h += meta("Our side", c.ourSide || "—");
+  h += meta("Status", c.status === "disposed" ? "Disposed" : "Active");
+  if (c.clientPhone) h += meta("Client phone", c.clientPhone);
+  if (c.tags && c.tags.length) h += meta("Tags", c.tags.join(", "));
+  if ((c.tasks || []).filter(t => !t.done).length) h += meta("To do", (c.tasks || []).filter(t => !t.done).length + " open task(s)");
+  if ((c.docs || []).length) h += meta("Documents", (c.docs || []).length + " file(s)");
+  const ft = feeTotals(c);
+  if (ft.fees || ft.paid) h += meta("Fee balance", money(ft.balance) + " of " + money(ft.fees));
+  if (c.feeNotes) h += meta("Fee note", c.feeNotes);
+  h += "</div></div>";
+
+  const listings = syncFor(c).filter(m => m.date >= todayISO()).sort((a, b) => a.date.localeCompare(b.date));
+  if (listings.length) {
+    h += '<div class="card" style="border-left:3px solid var(--navy)"><div class="card__body" style="padding:11px 15px">';
+    listings.slice(0, 3).forEach(m => {
+      h += '<div style="font-size:13.5px"><b style="color:var(--navy)">Listed ' + fmtDate(m.date) + "</b> · CR NO " + esc(m.court_no || "—") + " · item " + esc(String(m.item)) + " · " + esc(m.list_kind || "") + "</div>";
+      h += '<div class="hint" style="margin-top:2px">' + esc(m.bench || "") + (m.parties ? " · " + esc((m.parties || "").slice(0, 80)) : "") + "</div>";
+    });
+    h += "</div></div>";
+  }
+
+  h += '<div class="tabs">';
+  h += tabBtn("diary", "Hearing diary", hearings.length);
+  h += tabBtn("tasks", "To do", (c.tasks || []).filter(t => !t.done).length);
+  h += tabBtn("docs", "Documents", (c.docs || []).length);
+  h += tabBtn("fees", "Fees", (c.fees || []).length);
+  h += tabBtn("orders", "Orders", orders.length);
+  h += tabBtn("notes", "Notes", notes.length);
+  h += tabBtn("details", "Details", 0);
+  h += "</div>";
+
+  if (ui.tab === "diary") {
+    h += '<div class="card"><div class="card__head"><h3>What happened, date by date</h3><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '">+ Add entry</button></div><div class="card__body">';
+    if (!hearings.length) h += '<div class="empty" style="padding:18px"><b>No entries yet.</b>After each hearing, record what the court did and the next purpose — that becomes your diary.</div>';
+    else {
+      h += '<ul class="timeline">';
+      hearings.forEach(he => {
+        h += "<li>";
+        h += '<div class="tl-date">' + fmtDate(he.date) + " · " + esc(dayName(he.date).slice(0, 3)) + "</div>";
+        if (he.what) h += '<div class="tl-body">' + esc(he.what) + "</div>";
+        if (he.purpose || he.nextDate) {
+          h += '<div class="tl-next">' + (he.purpose ? "Next: " + esc(he.purpose) : "") + (he.nextDate ? (he.purpose ? " · " : "Next date: ") + fmtDate(he.nextDate) : "") + "</div>";
+        }
+        h += '<div class="tl-actions"><button class="btn btn--sm btn--ghost" data-action="edit-hearing" data-id="' + esc(c.id) + '" data-hid="' + esc(he.id) + '">Edit</button>';
+        h += '<button class="btn btn--sm btn--ghost" data-action="del-hearing" data-id="' + esc(c.id) + '" data-hid="' + esc(he.id) + '">Delete</button></div>';
+        h += "</li>";
+      });
+      h += "</ul>";
+    }
+    h += "</div></div>";
+  }
+
+
+  if (ui.tab === "tasks") {
+    const ts = (c.tasks || []).slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || (a.due || "9999").localeCompare(b.due || "9999"));
+    h += '<div class="card"><div class="card__head"><h3>What is to be done</h3>';
+    h += '<button class="btn btn--sm btn--primary" data-action="add-task" data-id="' + esc(c.id) + '">+ Add task</button></div><div class="card__body">';
+    if (!ts.length) h += '<div class="empty" style="padding:18px"><b>No tasks.</b>Drafting, filing, service, calling the client, checking the file — put it here with a date and it will show up in To do and Alerts.</div>';
+    else {
+      ts.forEach(t => {
+        const late = !t.done && t.due && t.due < todayISO();
+        h += '<div class="note' + (late ? ' is-pinned' : '') + '" style="display:flex;gap:10px;align-items:flex-start">';
+        h += '<input type="checkbox" data-action="toggle-task" data-id="' + esc(c.id) + '" data-tid="' + esc(t.id) + '"' + (t.done ? ' checked' : '') + ' style="width:17px;height:17px;margin-top:2px;cursor:pointer">';
+        h += '<div style="flex:1;min-width:0">';
+        h += '<div class="note__text"' + (t.done ? ' style="text-decoration:line-through;color:var(--ink-3)"' : '') + '>' + esc(t.text) + '</div>';
+        h += '<div class="note__foot"><span>' + (t.due ? (late ? '<b style="color:var(--danger)">' + fmtDate(t.due) + ' · overdue</b>' : fmtDate(t.due)) : 'no date');
+        h += t.priority === 'high' ? ' · high priority' : '';
+        h += '</span><span class="acts">';
+        h += '<button class="btn btn--sm btn--ghost" data-action="edit-task" data-id="' + esc(c.id) + '" data-tid="' + esc(t.id) + '">Edit</button>';
+        h += '<button class="btn btn--sm btn--ghost" data-action="del-task" data-id="' + esc(c.id) + '" data-tid="' + esc(t.id) + '">Delete</button>';
+        h += '</span></div></div></div>';
+      });
+    }
+    h += '</div></div>';
+  }
+
+  if (ui.tab === "docs") {
+    const ds = (c.docs || []).slice().sort((a, b) => String(b.addedAt || '').localeCompare(String(a.addedAt || '')));
+    const total = ds.reduce((n, d) => n + (Number(d.size) || 0), 0);
+    h += '<div class="card"><div class="card__head"><h3>Documents</h3><div class="head-actions">';
+    h += '<select id="docKind" style="padding:6px 8px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);font-size:12.5px">';
+    DOC_KINDS.forEach(k => { h += '<option' + (k === 'Other' ? ' selected' : '') + '>' + esc(k) + '</option>'; });
+    h += '</select>';
+    h += '<button class="btn btn--sm btn--primary" data-action="upload-doc" data-id="' + esc(c.id) + '">+ Upload file</button>';
+    h += '</div></div>';
+    h += '<input type="file" id="docFile" multiple data-file="doc" data-case="' + esc(c.id) + '" style="display:none">';
+    if (!ds.length) {
+      h += '<div class="empty" style="padding:22px"><b>No documents yet.</b>Vakalatnama, petition, evidence, orders, judgments — keep the PDFs with the case. They stay on this device, never uploaded.</div>';
+    } else {
+      h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>File</th><th>Kind</th><th>Size</th><th>Added</th><th></th></tr></thead><tbody>';
+      ds.forEach(d => {
+        h += '<tr><td><a href="#" data-action="open-doc" data-doc="' + esc(d.id) + '" class="case-title">' + esc(d.name) + '</a></td>';
+        h += '<td><span class="badge">' + esc(d.kind || 'Other') + '</span></td>';
+        h += '<td class="num">' + humanSize(d.size) + '</td>';
+        h += '<td class="num nowrap">' + fmtDate(String(d.addedAt || '').slice(0, 10)) + '</td>';
+        h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="open-doc" data-doc="' + esc(d.id) + '">Open</button> ';
+        h += '<button class="btn btn--sm btn--ghost" data-action="download-doc" data-doc="' + esc(d.id) + '" data-name="' + esc(d.name) + '">Save</button> ';
+        h += '<button class="btn btn--sm btn--ghost" data-action="del-doc" data-id="' + esc(c.id) + '" data-doc="' + esc(d.id) + '">×</button></td></tr>';
+      });
+      h += '</tbody></table></div>';
+      h += '<div class="hint" style="padding:10px 15px">' + ds.length + ' file(s) · ' + humanSize(total) + ' on this device</div></div>';
+    }
+    h += '</div>';
+  }
+
+  if (ui.tab === "fees") {
+    const ft2 = feeTotals(c);
+    const fs = (c.fees || []).slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    h += '<div class="card"><div class="card__head"><h3>Fee ledger</h3>';
+    h += '<button class="btn btn--sm btn--primary" data-action="add-fee" data-id="' + esc(c.id) + '">+ Add entry</button></div>';
+    h += '<div class="card__body" style="display:flex;gap:22px;flex-wrap:wrap;border-bottom:1px solid var(--line)">';
+    h += '<div><div class="k hint">Billed</div><div style="font-family:var(--font-head);font-size:19px">' + money(ft2.fees) + '</div></div>';
+    h += '<div><div class="k hint">Received</div><div style="font-family:var(--font-head);font-size:19px;color:var(--sage)">' + money(ft2.paid) + '</div></div>';
+    h += '<div><div class="k hint">Balance</div><div style="font-family:var(--font-head);font-size:19px;color:' + (ft2.balance > 0 ? 'var(--danger)' : 'var(--ink)') + '">' + money(ft2.balance) + '</div></div>';
+    h += '</div>';
+    if (!fs.length) {
+      h += '<div class="empty" style="padding:22px"><b>No entries.</b>Add the agreed fee as one entry and each receipt as another — the balance keeps itself.</div>';
+    } else {
+      h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Particulars</th><th class="num">Amount</th><th></th></tr></thead><tbody>';
+      fs.forEach(f => {
+        h += '<tr><td class="num nowrap">' + fmtDate(f.date) + '</td>';
+        h += '<td>' + esc(f.particulars || '') + (f.kind === 'payment' ? ' <span class="badge badge--sage">Received</span>' : ' <span class="badge badge--navy">Billed</span>') + '</td>';
+        h += '<td class="num"' + (f.kind === 'payment' ? ' style="color:var(--sage)"' : '') + '>' + (f.kind === 'payment' ? '−' : '') + money(f.amount) + '</td>';
+        h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="del-fee" data-id="' + esc(c.id) + '" data-fid="' + esc(f.id) + '">×</button></td></tr>';
+      });
+      h += '</tbody></table></div></div>';
+    }
+    h += '</div>';
+  }
+
+  if (ui.tab === "orders") {
+    h += '<div class="card"><div class="card__head"><h3>Orders passed</h3><button class="btn btn--sm" data-action="add-order" data-id="' + esc(c.id) + '">+ Add order</button></div>';
+    if (!orders.length) {
+      h += '<div class="empty" style="padding:22px"><b>No orders recorded.</b>Paste the operative part of an order here, keep the link to the PDF, and tick it off when you have read it.</div>';
+    } else {
+      h += '<div class="card__body card__body--flush">';
+      orders.forEach(o => { h += orderRowHTML(c, o, false); });
+      h += "</div>";
+    }
+    h += "</div>";
+  }
+
+  if (ui.tab === "notes") {
+    h += '<div class="card"><div class="card__head"><h3>Case notes</h3><button class="btn btn--sm" data-action="add-note" data-id="' + esc(c.id) + '">+ Add note</button></div><div class="card__body">';
+    if (!notes.length) h += '<div class="empty" style="padding:18px"><b>No notes.</b>Instructions from the client, points for arguments, things to check before the date.</div>';
+    else {
+      notes.forEach(n => {
+        h += '<div class="note' + (n.pinned ? " is-pinned" : "") + '">';
+        h += '<div class="note__text">' + esc(n.text) + "</div>";
+        h += '<div class="note__foot"><span>' + fmtDate((n.createdAt || "").slice(0, 10)) + (n.pinned ? " · pinned" : "") + "</span>";
+        h += '<span class="acts"><button class="btn btn--sm btn--ghost" data-action="pin-note" data-id="' + esc(c.id) + '" data-nid="' + esc(n.id) + '">' + (n.pinned ? "Unpin" : "Pin") + "</button>";
+        h += '<button class="btn btn--sm btn--ghost" data-action="del-note" data-id="' + esc(c.id) + '" data-nid="' + esc(n.id) + '">Delete</button></span>';
+        h += "</div></div>";
+      });
+    }
+    h += "</div></div>";
+  }
+
+  if (ui.tab === "details") {
+    h += '<div class="card"><div class="card__head"><h3>Case particulars</h3><button class="btn btn--sm btn--ghost" data-action="edit-case" data-id="' + esc(c.id) + '">Edit</button></div><div class="card__body">';
+    h += '<div class="meta-grid">';
+    h += meta("Client", c.client || "—");
+    h += meta("Opposite party", c.opposite || "—");
+    h += meta("Court", c.court || "—");
+    h += meta("Room / bench", c.room || "—");
+    h += meta("Case number", c.caseNo || "—");
+    h += meta("CNR", c.cnr || "—");
+    h += meta("Stage", c.stage || "—");
+    h += meta("Our side", c.ourSide || "—");
+    h += meta("Client phone", c.clientPhone || "—");
+    h += meta("Fee note", c.feeNotes || "—");
+    h += meta("Status", c.status === "disposed" ? "Disposed" : "Active");
+    h += meta("Tags", (c.tags || []).join(", ") || "—");
+    h += meta("Added", fmtDate((c.createdAt || "").slice(0, 10)));
+    h += "</div>";
+    if (c.courtNote) h += '<div style="margin-top:16px"><div class="section-label"><span class="dot dot--navy"></span>Court / registry note</div><div class="tl-body">' + esc(c.courtNote) + "</div></div>";
+    h += '<div style="margin-top:22px;display:flex;gap:8px;flex-wrap:wrap">';
+    h += '<button class="btn btn--ghost" data-action="toggle-status" data-id="' + esc(c.id) + '">Mark as ' + (c.status === "disposed" ? "active" : "disposed") + "</button>";
+    h += '<button class="btn btn--danger" data-action="delete-case" data-id="' + esc(c.id) + '">Delete this case</button>';
+    h += "</div></div></div>";
+  }
+  return h;
+}
+function meta(k, v) {
+  return '<div class="meta-item"><div class="k">' + esc(k) + '</div><div class="v">' + esc(v) + "</div></div>";
+}
+function tabBtn(id, label, n) {
+  return '<button class="tab' + (ui.tab === id ? " is-on" : "") + '" data-action="tab" data-tab="' + id + '">' + esc(label) + (n ? '<span class="tab__n">' + n + "</span>" : "") + "</button>";
+}
+function orderRowHTML(c, o, compact) {
+  let h = '<div class="order-row' + (o.read ? "" : " is-unread") + '">';
+  h += '<div class="order-body">';
+  h += '<div class="order-top"><span class="order-date">' + fmtDate(o.date) + "</span>";
+  h += '<span class="badge ' + (o.read ? "badge--sage" : "badge--gold") + '">' + (o.read ? "Read" : "Unread") + "</span>";
+  if (o.bench) h += '<span class="hint">' + esc(o.bench) + "</span>";
+  h += "</div>";
+  h += '<div class="hint" style="margin-top:2px">' + esc(caseTitle(c)) + " · " + esc(c.caseNo || "") + "</div>";
+  if (o.summary) h += '<div class="order-text' + (compact ? " order-text--clamped" : "") + '">' + esc(o.summary) + "</div>";
+  if (o.link) h += '<div style="margin-top:6px"><a href="' + esc(o.link) + '" target="_blank" rel="noopener" class="hint">Open order link ↗</a></div>';
+  h += "</div>";
+  h += '<div class="order-actions">';
+  h += '<button class="btn btn--sm" data-action="toggle-order" data-id="' + esc(c.id) + '" data-oid="' + esc(o.id) + '">' + (o.read ? "Mark unread" : "Mark read") + "</button>";
+  if (!compact) {
+    h += '<button class="btn btn--sm btn--ghost" data-action="edit-order" data-id="' + esc(c.id) + '" data-oid="' + esc(o.id) + '">Edit</button>';
+    h += '<button class="btn btn--sm btn--ghost" data-action="del-order" data-id="' + esc(c.id) + '" data-oid="' + esc(o.id) + '">Delete</button>';
+  }
+  h += "</div></div>";
+  return h;
+}
+
+/* ---------------- view: all orders ---------------- */
+function viewOrders() {
+  const all = allOrders();
+  const unread = all.filter(x => !x.o.read);
+  const list = ui.showAllOrders ? all : unread;
+  let h = "";
+  h += '<div class="page-head"><div><div class="eyebrow">Order sheet</div>';
+  h += '<h1 class="page-title">' + unread.length + " order" + (unread.length === 1 ? "" : "s") + " to read</h1>";
+  h += '<div class="page-sub">' + all.length + " orders recorded across your cases</div></div>";
+  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="toggle-order-view">' + (ui.showAllOrders ? "Show unread only" : "Show all orders") + "</button></div></div>";
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  if (!list.length) h += '<div class="empty"><b>' + (ui.showAllOrders ? "No orders recorded yet." : "Nothing pending.") + "</b>Add orders from a case page — paste the operative part and keep the PDF link.</div>";
+  else list.forEach(x => { h += orderRowHTML(x.c, x.o, true); });
+  h += "</div></div>";
+  return h;
+}
+
+/* ---------------- view: settings ---------------- */
+
+/* ================= schedule ================= */
+function viewSchedule() {
+  const days = 45;
+  const buckets = new Map();
+  for (let i = 0; i < days; i++) buckets.set(isoAdd(todayISO(), i), { h: [], t: [], s: [] });
+  activeCases().forEach(c => { if (c.nextDate && buckets.has(c.nextDate)) buckets.get(c.nextDate).h.push(c); });
+  openTasks().forEach(x => { if (x.t.due && buckets.has(x.t.due)) buckets.get(x.t.due).t.push(x); });
+  if (courtSync && Array.isArray(courtSync.matches)) {
+    courtSync.matches.forEach(m => { if (buckets.has(m.date)) buckets.get(m.date).s.push(m); });
+  }
+  let h = '';
+  h += '<div class="page-head"><div><div class="eyebrow">Schedule</div>';
+  h += '<h1 class="page-title">The next six weeks</h1>';
+  h += '<div class="page-sub">Hearings, deadlines and what the court has listed</div></div>';
+  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="export-ics">Calendar file</button>';
+  h += '<button class="btn btn--primary" data-action="new-case">+ New case</button></div></div>';
+  let any = false;
+  buckets.forEach((b, d) => {
+    if (!b.h.length && !b.t.length && !b.s.length) return;
+    any = true;
+    const isToday = d === todayISO();
+    h += '<div class="card"><div class="card__head"><h3' + (isToday ? ' style="color:var(--terra)"' : '') + '>' + esc(dayName(d).slice(0, 3)) + ', ' + fmtDate(d) + '</h3>';
+    h += '<span class="hint">' + (b.h.length ? b.h.length + ' hearing(s) ' : '') + (b.t.length ? b.t.length + ' task(s)' : '') + '</span></div>';
+    h += '<div class="card__body card__body--flush">';
+    b.s.forEach(m => {
+      h += '<div class="order-row" style="background:var(--navy-soft)"><div class="order-body"><div class="order-top">';
+      h += '<span class="badge badge--navy">Court list</span><span class="order-date">CR NO ' + esc(m.court_no || '—') + ' · item ' + esc(String(m.item)) + '</span></div>';
+      h += '<div class="order-text">' + esc(m.case_label || m.case_no_in_list) + ' — ' + esc((m.parties || '').slice(0, 110)) + '</div>';
+      h += '<div class="hint">' + esc(m.bench || '') + '</div></div></div>';
+    });
+    b.h.forEach(c => {
+      h += '<div class="order-row"><div class="order-body"><div class="order-top">';
+      h += '<span class="badge badge--terra">Hearing</span><span class="hint">' + esc(c.court || '—') + (c.room ? ' · ' + esc(c.room) : '') + '</span></div>';
+      h += '<div class="order-text"><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '">' + esc(caseTitle(c)) + '</a>' + (c.stage ? ' · ' + esc(c.stage) : '') + '</div>';
+      h += '<div class="hint">' + esc(c.caseNo || '') + '</div></div>';
+      h += '<div class="order-actions"><button class="btn btn--sm" data-action="record-hearing" data-id="' + esc(c.id) + '" data-date="' + esc(d) + '">Record</button></div></div>';
+    });
+    b.t.forEach(x => {
+      h += '<div class="order-row"><div class="order-body"><div class="order-top"><span class="badge badge--gold">To do</span>';
+      h += x.t.priority === 'high' ? '<span class="badge badge--danger">High</span>' : '';
+      h += '</div><div class="order-text">' + esc(x.t.text) + '</div>';
+      h += '<div class="hint">' + esc(caseTitle(x.c)) + '</div></div>';
+      h += '<div class="order-actions"><button class="btn btn--sm btn--ghost" data-action="toggle-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '">Done</button></div></div>';
+    });
+    h += '</div></div>';
+  });
+  if (!any) h += '<div class="card"><div class="empty"><b>Nothing scheduled.</b>Set next dates and add tasks — they will line up here.</div></div>';
+  return h;
+}
+
+/* ================= tasks ================= */
+function viewTasks() {
+  const all = tasksAll();
+  const open = all.filter(x => !x.t.done);
+  const late = open.filter(x => x.t.due && x.t.due < todayISO());
+  let list = ui.taskFilter === 'done' ? all.filter(x => x.t.done)
+    : ui.taskFilter === 'all' ? all
+    : open.slice().sort((a, b) => {
+        const da = a.t.due || '9999-12-31', dbb = b.t.due || '9999-12-31';
+        if (da !== dbb) return da < dbb ? -1 : 1;
+        return (PRIORITY_RANK[a.t.priority] || 1) - (PRIORITY_RANK[b.t.priority] || 1);
+      });
+  let h = '';
+  h += '<div class="page-head"><div><div class="eyebrow">To do</div>';
+  h += '<h1 class="page-title">' + open.length + ' task' + (open.length === 1 ? '' : 's') + ' open</h1>';
+  h += '<div class="page-sub">' + (late.length ? late.length + ' overdue · ' : '') + tasksDueOn(todayISO()).length + ' due today · ' + all.filter(x => x.t.done).length + ' done</div></div></div>';
+  h += '<div class="toolbar"><div class="field"><label>Show</label><select data-change="task-filter">';
+  h += '<option value="open"' + (ui.taskFilter === 'open' ? ' selected' : '') + '>Open</option>';
+  h += '<option value="done"' + (ui.taskFilter === 'done' ? ' selected' : '') + '>Done</option>';
+  h += '<option value="all"' + (ui.taskFilter === 'all' ? ' selected' : '') + '>Everything</option>';
+  h += '</select></div></div>';
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  if (!list.length) h += '<div class="empty"><b>No tasks here.</b>Open a case and add what has to be done — drafting, filing, service, calling the client.</div>';
+  else {
+    h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34px"></th><th>Task</th><th>Case</th><th>Due</th><th>Priority</th><th></th></tr></thead><tbody>';
+    list.forEach(x => {
+      const isLate = !x.t.done && x.t.due && x.t.due < todayISO();
+      const isToday = !x.t.done && x.t.due === todayISO();
+      h += '<tr>';
+      h += '<td><input type="checkbox" data-action="toggle-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '"' + (x.t.done ? ' checked' : '') + ' style="width:16px;height:16px;cursor:pointer"></td>';
+      h += '<td' + (x.t.done ? ' style="text-decoration:line-through;color:var(--ink-3)"' : '') + '>' + esc(x.t.text) + '</td>';
+      h += '<td><a href="#/case/' + esc(x.c.id) + '" data-action="open-case" data-id="' + esc(x.c.id) + '">' + esc(caseTitle(x.c)) + '</a></td>';
+      h += '<td class="num nowrap"' + (isLate ? ' style="color:var(--danger);font-weight:600"' : isToday ? ' style="color:var(--terra);font-weight:600"' : '') + '>' + (x.t.due ? fmtDate(x.t.due) : '—') + '</td>';
+      h += '<td>' + (x.t.priority === 'high' ? '<span class="badge badge--danger">High</span>' : x.t.priority === 'low' ? '<span class="badge">Low</span>' : '<span class="badge badge--navy">Normal</span>') + '</td>';
+      h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="edit-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '">Edit</button> ';
+      h += '<button class="btn btn--sm btn--ghost" data-action="del-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '">×</button></td>';
+      h += '</tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+/* ================= alerts ================= */
+function viewAlerts() {
+  const items = alertItems();
+  const high = items.filter(x => x.level === 'high');
+  const rest = items.filter(x => x.level !== 'high');
+  let h = '';
+  h += '<div class="page-head"><div><div class="eyebrow">Alerts</div>';
+  h += '<h1 class="page-title">' + (items.length ? items.length + ' thing' + (items.length === 1 ? '' : 's') + ' needing you' : 'Nothing pending') + '</h1>';
+  h += '<div class="page-sub">Dates gone by, tasks overdue, orders unread, matters listed today</div></div>';
+  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="notify-ask">' + (db.settings.notify ? 'Notifications on' : 'Enable notifications') + '</button></div></div>';
+  if (!items.length) {
+    h += '<div class="card"><div class="empty"><b>All clear.</b>No passed dates, no overdue task, no unread order.</div></div>';
+    return h;
+  }
+  const block = (title, arr, cls) => {
+    if (!arr.length) return '';
+    let o = '<div class="card"><div class="card__head"><h3 class="' + cls + '">' + esc(title) + '</h3><span class="hint">' + arr.length + '</span></div><div class="card__body card__body--flush">';
+    arr.forEach(x => {
+      o += '<div class="order-row"><div class="order-body">';
+      o += '<div class="order-top"><span class="badge ' + (x.kind === 'listed' ? 'badge--terra' : x.kind === 'order' ? 'badge--gold' : x.kind === 'task' ? 'badge--navy' : 'badge--danger') + '">' + esc(x.kind === 'listed' ? 'Listed' : x.kind === 'order' ? 'Order' : x.kind === 'task' ? 'Task' : 'Date') + '</span></div>';
+      o += '<div class="order-text">' + esc(x.text) + '</div>';
+      o += '<div class="hint">' + esc(x.sub || '') + '</div></div>';
+      o += '<div class="order-actions"><button class="btn btn--sm btn--ghost" data-action="open-case" data-id="' + esc(x.caseId) + '">Open</button></div></div>';
+    });
+    return o + '</div></div>';
+  };
+  h += block('Urgent', high, '');
+  h += block('Also pending', rest, '');
+  return h;
+}
+
+/* ================= clients ================= */
+function clientList() {
+  const m = new Map();
+  db.cases.forEach(c => {
+    const k = (c.client || '—').trim() || '—';
+    if (!m.has(k)) m.set(k, { name: k, phone: '', email: '', cases: [] });
+    const e = m.get(k);
+    e.cases.push(c);
+    if (!e.phone && c.clientPhone) e.phone = c.clientPhone;
+    if (!e.email && c.clientEmail) e.email = c.clientEmail;
+  });
+  return Array.from(m.values()).sort((a, b) => a.name.localeCompare(b.name));
+}
+function viewClients() {
+  const list = clientList();
+  let h = '';
+  h += '<div class="page-head"><div><div class="eyebrow">Clients</div>';
+  h += '<h1 class="page-title">' + list.length + ' client' + (list.length === 1 ? '' : 's') + '</h1>';
+  h += '<div class="page-sub">Built from your case register — click a name to see their matters</div></div></div>';
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  if (!list.length) h += '<div class="empty"><b>No clients yet.</b>They appear as soon as you add a case.</div>';
+  else {
+    h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Client</th><th>Phone</th><th>Cases</th><th>Next date</th><th></th></tr></thead><tbody>';
+    list.forEach(x => {
+      const soon = x.cases.filter(c => c.nextDate).sort((a, b) => a.nextDate.localeCompare(b.nextDate))[0];
+      h += '<tr><td><a href="#/cases" data-action="filter-client" data-name="' + esc(x.name) + '" class="case-title">' + esc(x.name) + '</a>';
+      if (x.email) h += '<div class="case-meta">' + esc(x.email) + '</div>';
+      h += '</td>';
+      h += '<td class="num">' + (x.phone ? '<a href="tel:' + esc(x.phone) + '">' + esc(x.phone) + '</a>' : '—') + '</td>';
+      h += '<td class="num">' + x.cases.length + '</td>';
+      h += '<td class="num nowrap">' + (soon ? fmtDate(soon.nextDate) : '—') + '</td>';
+      h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="filter-client" data-name="' + esc(x.name) + '">Cases</button></td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+/* ================= money ================= */
+function viewMoney() {
+  const list = db.cases.filter(c => (c.fees || []).length || c.feeNotes).sort((a, b) => feeTotals(b).balance - feeTotals(a).balance);
+  const tot = moneyAll();
+  let h = '';
+  h += '<div class="page-head"><div><div class="eyebrow">Fees</div>';
+  h += '<h1 class="page-title">' + money(tot.balance) + ' outstanding</h1>';
+  h += '<div class="page-sub">Billed ' + money(tot.fees) + ' · received ' + money(tot.paid) + '</div></div></div>';
+  h += '<div class="stats" style="grid-template-columns:repeat(3,1fr)">';
+  h += '<div class="stat stat--hero"><div class="stat__n">' + money(tot.balance) + '</div><div class="stat__l">Outstanding</div></div>';
+  h += '<div class="stat"><div class="stat__n">' + money(tot.fees) + '</div><div class="stat__l">Billed</div></div>';
+  h += '<div class="stat"><div class="stat__n">' + money(tot.paid) + '</div><div class="stat__l">Received</div></div>';
+  h += '</div>';
+  h += '<div class="card"><div class="card__body card__body--flush">';
+  if (!list.length) h += '<div class="empty"><b>No fee entries yet.</b>Open a case, go to the Fees tab and add what was agreed and what has come in.</div>';
+  else {
+    h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Client / matter</th><th class="num">Billed</th><th class="num">Received</th><th class="num">Balance</th><th></th></tr></thead><tbody>';
+    list.forEach(c => {
+      const t = feeTotals(c);
+      h += '<tr><td><a href="#/case/' + esc(c.id) + '" data-action="open-case" data-id="' + esc(c.id) + '" class="case-title">' + esc(c.client || caseTitle(c)) + '</a><div class="case-meta">' + esc(c.caseNo || '') + ' · ' + esc(c.court || '') + '</div></td>';
+      h += '<td class="num">' + money(t.fees) + '</td><td class="num">' + money(t.paid) + '</td>';
+      h += '<td class="num"' + (t.balance > 0 ? ' style="color:var(--danger);font-weight:600"' : '') + '>' + money(t.balance) + '</td>';
+      h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="open-case-fees" data-id="' + esc(c.id) + '">Ledger</button></td></tr>';
+    });
+    h += '</tbody></table></div>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function viewSettings() {
+  const a = db.settings.advocate;
+  let h = "";
+  h += '<div class="page-head"><div><div class="eyebrow">Settings</div><h1 class="page-title">Your chambers</h1>';
+  h += '<div class="page-sub">These details print on cause lists and brief tops</div></div></div>';
+
+  h += '<div class="card"><div class="card__head"><h3>Advocate details</h3></div><div class="card__body">';
+  h += '<div class="grid-2">';
+  h += field("Name", '<input id="advName" value="' + esc(a.name) + '" placeholder="Abhinav Bali">');
+  h += field("Enrolment no.", '<input id="advEnrol" value="' + esc(a.enrolment) + '" placeholder="P/1234/2015">');
+  h += field("Chamber address", '<input id="advChamber" value="' + esc(a.chamber) + '" placeholder="Chamber no., Mohali">');
+  h += field("Phone", '<input id="advPhone" value="' + esc(a.phone) + '" placeholder="+91 …">');
+  h += "</div>";
+  h += '<div style="margin-top:12px"><button class="btn btn--primary" data-action="save-advocate">Save details</button></div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Courts in your practice</h3><span class="hint">' + db.settings.courts.length + " courts</span></div><div class=\"card__body\">";
+  h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">';
+  db.settings.courts.forEach((c, i) => {
+    h += '<span class="badge badge--navy" style="padding:4px 9px">' + esc(c) + ' <button class="x" style="font-size:13px;padding:0 2px" title="Remove" data-action="del-court" data-i="' + i + '">×</button></span>';
+  });
+  h += "</div>";
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap"><input id="newCourt" placeholder="Add a court or tribunal" style="flex:1 1 240px;padding:8px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface)">';
+  h += '<button class="btn" data-action="add-court">Add court</button></div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Backup and data</h3></div><div class="card__body">';
+  h += '<p class="hint" style="margin-top:0">Everything lives in this browser on this device. Clearing browser data, or using private mode, can wipe it. Export a backup file regularly and keep it in Drive.</p>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h += '<button class="btn btn--primary" data-action="export-json">Download backup (.json)</button>';
+  h += '<button class="btn" data-action="import-json">Restore from backup</button>';
+  h += '<button class="btn btn--ghost" data-action="export-csv">Export cases (.csv)</button>';
+  h += '<button class="btn btn--ghost" data-action="import-csv">Import cases (.csv)</button>';
+  h += '<button class="btn btn--ghost" data-action="csv-template">Download CSV template</button>';
+  h += '<button class="btn btn--ghost" data-action="export-ics">Calendar (.ics)</button>';
+  h += "</div>";
+  h += '<input type="file" id="fileJson" accept=".json,application/json" style="display:none" data-file="json">';
+  h += '<input type="file" id="fileCsv" accept=".csv,text/csv" style="display:none" data-file="csv">';
+  h += '<div class="hint" style="margin-top:14px">CSV columns: client, opposite, court, caseNo, cnr, stage, ourSide, nextDate (YYYY-MM-DD), tags (comma separated), clientPhone, feeNotes</div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Court sync</h3><span class="hint">' + esc(courtSyncNote || "not loaded") + "</span></div><div class=\"card__body\">";
+  h += '<p class="hint" style="margin:0">The daily sync reads the High Court cause lists, finds your matters and writes <span class="mono">data.json</span> and <span class="mono">diary.ics</span> next to this app. Add the calendar feed to Google Calendar once and it keeps itself updated.</p>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">';
+  h += '<button class="btn btn--ghost" data-action="reload-sync">Refresh court data</button>';
+  h += '<button class="btn btn--ghost" data-action="export-sync-cases">Export cases.json (for the sync)</button>';
+  if (courtSync && courtSync.generated_at) h += '<span class="hint">Last run: ' + esc(String(courtSync.generated_at).slice(0, 16).replace("T", " ")) + " UTC · " + (courtSync.entries_scanned || 0) + " entries scanned</span>";
+  h += "</div></div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Google Calendar</h3><span class="hint">reminders on your phone</span></div><div class="card__body">';
+  h += '<p class="hint" style="margin-top:0">Download a calendar file with every dated hearing as an all-day event, plus a reminder at 9 am the previous day. Then in Google Calendar on a laptop:</p>';
+  h += '<ol class="hint" style="margin:0 0 12px;padding-left:20px;line-height:1.8">';
+  h += '<li>Settings (gear) → <b>Import &amp; export</b> → Import</li>';
+  h += '<li>Choose the downloaded <span class="mono">.ics</span> file, pick a calendar — use a separate one called "Court Diary" so you can clear it in one go — then Import</li>';
+  h += '<li>Repeat after you update dates. Events keep the same ID, so a re-import updates them instead of piling up duplicates</li>';
+  h += "</ol>";
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h += '<button class="btn btn--primary" data-action="export-ics">Download calendar (.ics)</button>';
+  h += '<button class="btn btn--ghost" data-action="export-ics-norem">Download without reminders</button>';
+  h += "</div>";
+  h += '<div class="hint" style="margin-top:12px">If the same hearing ever shows up twice, delete the "Court Diary" calendar and import into a fresh one.</div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Getting started</h3></div><div class="card__body">';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  h += '<button class="btn btn--ghost" data-action="load-sample">Load 3 sample cases</button>';
+  h += '<button class="btn btn--danger" data-action="wipe">Erase all data</button>';
+  h += "</div>";
+  h += '<div class="hint" style="margin-top:12px">Sample cases are marked with the tag <span class="tag">sample</span> — delete them once you have added your own.</div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Reminders and notifications</h3></div><div class="card__body">';
+  h += '<p class="hint" style="margin-top:0">Hearing reminders come from Google Calendar (Settings → Google Calendar below). In-app alerts are always on. Browser notifications work only while this app is open — that is a limit of a web app with no server.</p>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
+  h += '<button class="btn ' + (db.settings.notify ? 'btn--primary' : '') + '" data-action="notify-ask">' + (db.settings.notify ? 'Notifications enabled' : 'Enable browser notifications') + '</button>';
+  h += '<span class="hint">' + esc(("Notification" in window) ? Notification.permission : "not supported here") + '</span>';
+  h += "</div></div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>Documents and backup</h3></div><div class="card__body">';
+  h += '<p class="hint" style="margin-top:0">Case records — cases, hearings, orders, notes, tasks, fees — are in the JSON backup. <b>Uploaded files are not</b>: they live in this browser\'s storage, because a JSON file cannot carry PDFs sensibly. Keep your originals in Google Drive as well, and use Save on each document to pull a copy down.</p>';
+  h += '<div class="hint">If an upload ever fails to save, open the app from its https address rather than a local file — some browsers restrict storage for local files.</div>';
+  h += "</div></div>";
+
+  h += '<div class="card"><div class="card__head"><h3>What this app does not do</h3></div><div class="card__body">';
+  h += '<p class="hint" style="margin:0">No automatic eCourts or High Court sync — the courts publish no public API, so case data, orders and next dates are entered by you (or imported from CSV). No cloud sync between devices: to move to another device, export a backup and restore it there. No notifications — use your phone calendar alongside it for hearing reminders.</p>';
+  h += "</div></div>";
+  return h;
+}
+function field(label, control) {
+  return '<div class="field"><label>' + esc(label) + "</label>" + control + "</div>";
+}
+
+/* ---------------- modal ---------------- */
+function closeModal() { $("#modal-root").innerHTML = ""; }
+function openModal(opts) {
+  const root = $("#modal-root");
+  root.innerHTML =
+    '<div class="overlay" data-action="overlay">' +
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<div class="modal__head"><h3>' + esc(opts.title) + '</h3><button class="x" data-action="close-modal" aria-label="Close">×</button></div>' +
+        '<form id="modal-form">' +
+          '<div class="modal__body">' + opts.body + '</div>' +
+          '<div class="modal__foot">' +
+            (opts.danger ? '<button type="button" class="btn btn--danger" data-action="' + opts.danger.action + '" data-id="' + esc(opts.danger.id) + '" style="margin-right:auto">' + esc(opts.danger.label) + '</button>' : "") +
+            (opts.hideCancel ? "" : '<button type="button" class="btn btn--ghost" data-action="close-modal">Cancel</button>') +
+            '<button type="submit" class="btn btn--primary">' + esc(opts.submit || "Save") + "</button>" +
+          "</div>" +
+        "</form>" +
+      "</div>" +
+    "</div>";
+  const form = $("#modal-form");
+  form.addEventListener("submit", ev => {
+    ev.preventDefault();
+    if (opts.onSubmit) opts.onSubmit(new FormData(form));
+  });
+  const first = $("input,select,textarea", form);
+  if (first) setTimeout(() => first.focus(), 30);
+}
+function formVal(fd, k) { const v = fd.get(k); return v == null ? "" : String(v).trim(); }
+
+/* ---------------- case form ---------------- */
+function caseForm(c) {
+  const courts = db.settings.courts.slice();
+  if (c.court && courts.indexOf(c.court) === -1) courts.push(c.court);
+  const sides = ["", "Petitioner", "Respondent", "Appellant", "Applicant", "Complainant", "Opposite Party", "Accused", "Plaintiff", "Defendant"];
+  let h = '<div class="grid-2">';
+  h += field("Client / our party *", '<input name="client" required value="' + esc(c.client) + '" placeholder="Name of your client">');
+  h += field("Opposite party", '<input name="opposite" value="' + esc(c.opposite) + '" placeholder="Other side">');
+  h += field("Court / tribunal", '<select name="court">' + courts.map(x => '<option value="' + esc(x) + '"' + (c.court === x ? " selected" : "") + ">" + esc(x) + "</option>").join("") + "</select>");
+  h += field("Room / bench", '<input name="room" value="' + esc(c.room) + '" placeholder="e.g. Court Room 3, DB">');
+  h += field("Case number", '<input name="caseNo" value="' + esc(c.caseNo) + '" placeholder="e.g. CRR-1234-2024">');
+  h += field("CNR number", '<input name="cnr" value="' + esc(c.cnr) + '" placeholder="e.g. PHHC010012342024">');
+  h += field("Stage / purpose", '<input name="stage" value="' + esc(c.stage) + '" placeholder="e.g. Arguments, Evidence, Notice">');
+  h += field("Our side", '<select name="ourSide">' + sides.map(x => '<option value="' + esc(x) + '"' + (c.ourSide === x ? " selected" : "") + ">" + (x || "—") + "</option>").join("") + "</select>");
+  h += field("Next date", '<input type="date" name="nextDate" value="' + esc(c.nextDate) + '">');
+  h += field("Status", '<select name="status"><option value="active"' + (c.status !== "disposed" ? " selected" : "") + ">Active</option><option value=\"disposed\"" + (c.status === "disposed" ? " selected" : "") + ">Disposed</option></select>");
+  h += field("Client phone", '<input name="clientPhone" value="' + esc(c.clientPhone) + '" placeholder="Optional">');
+  h += field("Tags", '<input name="tags" value="' + esc((c.tags || []).join(", ")) + '" placeholder="e.g. stay, bail, cheque">');
+  h += "</div>";
+  h += field("Fee note", '<input name="feeNotes" value="' + esc(c.feeNotes) + '" placeholder="Optional — agreed fee, received, balance">');
+  h += field("Court / registry note", '<textarea name="courtNote" placeholder="Anything about the file itself: caveat, service status, condonation…">' + esc(c.courtNote) + "</textarea>");
+  return h;
+}
+function newCase() {
+  const c = normaliseCase({ id: uid(), client: "", opposite: "", court: db.settings.courts[0] || "", room: "", caseNo: "", cnr: "", stage: "", ourSide: "", nextDate: "", status: "active", tags: [], feeNotes: "", clientPhone: "", courtNote: "", hearings: [], orders: [], notes: [], createdAt: new Date().toISOString() });
+  openModal({
+    title: "New case",
+    body: caseForm(c),
+    submit: "Add case",
+    onSubmit: fd => {
+      const cur = getCase(c.id) || c;
+      cur.client = formVal(fd, "client");
+      cur.opposite = formVal(fd, "opposite");
+      cur.court = formVal(fd, "court");
+      cur.room = formVal(fd, "room");
+      cur.caseNo = formVal(fd, "caseNo");
+      cur.cnr = formVal(fd, "cnr");
+      cur.stage = formVal(fd, "stage");
+      cur.ourSide = formVal(fd, "ourSide");
+      cur.nextDate = formVal(fd, "nextDate");
+      cur.status = formVal(fd, "status") || "active";
+      cur.clientPhone = formVal(fd, "clientPhone");
+      cur.tags = splitTags(formVal(fd, "tags"));
+      cur.feeNotes = formVal(fd, "feeNotes");
+      cur.courtNote = formVal(fd, "courtNote");
+      cur.updatedAt = new Date().toISOString();
+      upsertCase(cur);
+      closeModal();
+      toast("Case added");
+      go("case", { caseId: cur.id, tab: "diary" });
+    }
+  });
+}
+function editCase(id) {
+  const c = getCase(id);
+  if (!c) return;
+  openModal({
+    title: "Edit case",
+    body: caseForm(c),
+    submit: "Save changes",
+    onSubmit: fd => {
+      c.client = formVal(fd, "client");
+      c.opposite = formVal(fd, "opposite");
+      c.court = formVal(fd, "court");
+      c.room = formVal(fd, "room");
+      c.caseNo = formVal(fd, "caseNo");
+      c.cnr = formVal(fd, "cnr");
+      c.stage = formVal(fd, "stage");
+      c.ourSide = formVal(fd, "ourSide");
+      c.nextDate = formVal(fd, "nextDate");
+      c.status = formVal(fd, "status") || "active";
+      c.clientPhone = formVal(fd, "clientPhone");
+      c.tags = splitTags(formVal(fd, "tags"));
+      c.feeNotes = formVal(fd, "feeNotes");
+      c.courtNote = formVal(fd, "courtNote");
+      c.updatedAt = new Date().toISOString();
+      upsertCase(c);
+      closeModal();
+      toast("Saved");
+      render();
+    }
+  });
+}
+
+/* ---------------- hearing form ---------------- */
+function recordHearing(id, presetDate, hearingId) {
+  const c = getCase(id);
+  if (!c) return;
+  const existing = hearingId ? (c.hearings || []).find(x => x.id === hearingId) : null;
+  const he = existing || { id: uid(), date: presetDate || todayISO(), what: "", purpose: "", nextDate: "" };
+  let h = "";
+  h += '<div class="grid-2">';
+  h += field("Date of hearing", '<input type="date" name="date" required value="' + esc(he.date) + '">');
+  h += field("Next date (leave blank if not given)", '<input type="date" name="nextDate" value="' + esc(he.nextDate) + '">');
+  h += "</div>";
+  h += field("What happened / business done", '<textarea name="what" placeholder="e.g. Arguments heard in part; adjourned on request of the other side for reply.">' + esc(he.what) + "</textarea>");
+  h += field("Purpose for next date", '<input name="purpose" value="' + esc(he.purpose) + '" placeholder="e.g. Reply, Rejoinder, Final arguments">');
+  h += '<div class="hint">Saving updates the next date of <b>' + esc(caseTitle(c)) + "</b> automatically.</div>";
+  openModal({
+    title: existing ? "Edit hearing entry" : "Record hearing — " + caseTitle(c),
+    body: h,
+    submit: existing ? "Save entry" : "Save entry",
+    onSubmit: fd => {
+      const date = formVal(fd, "date") || todayISO();
+      const what = formVal(fd, "what");
+      const purpose = formVal(fd, "purpose");
+      const nextDate = formVal(fd, "nextDate");
+      if (existing) {
+        existing.date = date; existing.what = what; existing.purpose = purpose; existing.nextDate = nextDate;
+      } else {
+        c.hearings = c.hearings || [];
+        c.hearings.push({ id: uid(), date, what, purpose, nextDate, createdAt: new Date().toISOString() });
+      }
+      if (nextDate) c.nextDate = nextDate;
+      if (purpose) c.stage = purpose;
+      c.updatedAt = new Date().toISOString();
+      upsertCase(c);
+      closeModal();
+      toast(existing ? "Entry updated" : "Hearing recorded");
+      if (ui.route === "case") { ui.tab = "diary"; render(); } else render();
+    }
+  });
+}
+
+/* ---------------- order form ---------------- */
+function orderForm(id, orderId) {
+  const c = getCase(id);
+  if (!c) return;
+  const existing = orderId ? (c.orders || []).find(x => x.id === orderId) : null;
+  const o = existing || { id: uid(), date: todayISO(), bench: "", summary: "", link: "", read: false };
+  let h = "";
+  h += '<div class="grid-2">';
+  h += field("Order date", '<input type="date" name="date" required value="' + esc(o.date) + '">');
+  h += field("Bench / judge", '<input name="bench" value="' + esc(o.bench) + '" placeholder="e.g. Hon\'ble Mr. Justice …">');
+  h += "</div>";
+  h += field("What the order says", '<textarea name="summary" style="min-height:130px" placeholder="Paste the operative part, or note it in your own words.">' + esc(o.summary) + "</textarea>");
+  h += field("Link to order PDF (optional)", '<input name="link" value="' + esc(o.link) + '" placeholder="https://…">');
+  h += '<div class="field"><label>Status</label><select name="read"><option value="no"' + (!o.read ? " selected" : "") + ">Unread — to be read</option><option value=\"yes\"" + (o.read ? " selected" : "") + ">Already read</option></select></div>";
+  openModal({
+    title: existing ? "Edit order" : "Add order — " + caseTitle(c),
+    body: h,
+    submit: "Save order",
+    onSubmit: fd => {
+      const rec = existing || { id: uid(), createdAt: new Date().toISOString() };
+      rec.date = formVal(fd, "date") || todayISO();
+      rec.bench = formVal(fd, "bench");
+      rec.summary = formVal(fd, "summary");
+      rec.link = formVal(fd, "link");
+      rec.read = formVal(fd, "read") === "yes";
+      if (!existing) { c.orders = c.orders || []; c.orders.push(rec); }
+      c.updatedAt = new Date().toISOString();
+      upsertCase(c);
+      closeModal();
+      toast(existing ? "Order updated" : "Order added");
+      render();
+    }
+  });
+}
+
+/* ================= task / fee forms, documents, notifications ================= */
+function taskForm(caseId, taskId) {
+  const c = getCase(caseId);
+  if (!c) return;
+  const existing = taskId ? (c.tasks || []).find(t => t.id === taskId) : null;
+  const t = existing || { id: uid(), text: "", due: "", priority: "normal", done: false };
+  let h = "";
+  h += field("What has to be done", '<textarea name="text" required placeholder="e.g. Draft reply to the application, get client signature, file before 4 pm">' + esc(t.text) + "</textarea>");
+  h += '<div class="grid-2">';
+  h += field("Due date", '<input type="date" name="due" value="' + esc(t.due) + '">');
+  h += field("Priority", '<select name="priority">' +
+    ['high', 'normal', 'low'].map(x => '<option value="' + x + '"' + (t.priority === x ? ' selected' : '') + '>' + x.charAt(0).toUpperCase() + x.slice(1) + '</option>').join('') + '</select>');
+  h += "</div>";
+  h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
+  openModal({
+    title: existing ? "Edit task" : "Add task",
+    body: h,
+    submit: existing ? "Save task" : "Add task",
+    onSubmit: fd => {
+      const rec = existing || { id: uid(), done: false, createdAt: new Date().toISOString() };
+      rec.text = formVal(fd, "text");
+      rec.due = formVal(fd, "due");
+      rec.priority = formVal(fd, "priority") || "normal";
+      if (!rec.text) { closeModal(); return; }
+      if (!existing) { c.tasks = c.tasks || []; c.tasks.push(rec); }
+      upsertCase(c); closeModal();
+      toast(existing ? "Task updated" : "Task added");
+      if (ui.route === "case") ui.tab = "tasks";
+      render();
+    }
+  });
+}
+
+function feeForm(caseId) {
+  const c = getCase(caseId);
+  if (!c) return;
+  let h = "";
+  h += '<div class="grid-2">';
+  h += field("Date", '<input type="date" name="date" required value="' + todayISO() + '">');
+  h += field("Type", '<select name="kind"><option value="fee">Fee billed</option><option value="payment">Payment received</option></select>');
+  h += "</div>";
+  h += field("Particulars", '<input name="particulars" placeholder="e.g. Fee for arguments, or Cash received against fee">');
+  h += field("Amount (₹)", '<input name="amount" type="number" min="0" step="1" required placeholder="50000">');
+  h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
+  openModal({
+    title: "Add fee entry",
+    body: h,
+    submit: "Add entry",
+    onSubmit: fd => {
+      const amt = Number(formVal(fd, "amount")) || 0;
+      if (!amt) { closeModal(); return; }
+      c.fees = c.fees || [];
+      c.fees.push({ id: uid(), date: formVal(fd, "date") || todayISO(), particulars: formVal(fd, "particulars"), amount: amt, kind: formVal(fd, "kind") === "payment" ? "payment" : "fee" });
+      upsertCase(c); closeModal(); toast("Entry added");
+      if (ui.route === "case") ui.tab = "fees";
+      render();
+    }
+  });
+}
+
+function openDoc(docId) {
+  idbGet(docId).then(rec => {
+    if (!rec || !rec.blob) { toast("That file is not on this device"); return; }
+    const url = URL.createObjectURL(rec.blob);
+    const type = String(rec.type || "");
+    const isPdf = type.indexOf("pdf") !== -1 || /\.pdf$/i.test(rec.name || "");
+    const isImg = type.indexOf("image") !== -1;
+    let body = "";
+    if (isPdf) body += '<iframe src="' + url + '" style="width:100%;height:68vh;border:1px solid var(--line);border-radius:8px;background:#fff"></iframe>';
+    else if (isImg) body += '<img src="' + url + '" alt="" style="max-width:100%;border-radius:8px">';
+    else body += '<p class="hint">This kind of file cannot be shown in the browser. Use Save a copy to open it in its own app.</p>';
+    body += '<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap">';
+    body += '<span class="hint">' + esc(rec.name || "") + '</span>';
+    body += '<a class="btn btn--sm" href="' + url + '" download="' + esc(rec.name || "document") + '">Save a copy</a>';
+    body += "</div>";
+    openModal({ title: "Document", body: body, submit: "Close", hideCancel: true, onSubmit: () => closeModal() });
+    setTimeout(() => { try { URL.revokeObjectURL(url); } catch (e) {} }, 300000);
+  }).catch(() => toast("Could not open the file — open the app from its https address"));
+}
+
+function downloadDoc(docId, name) {
+  idbGet(docId).then(rec => {
+    if (!rec || !rec.blob) { toast("That file is not on this device"); return; }
+    const url = URL.createObjectURL(rec.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name || rec.name || "document";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => { try { URL.revokeObjectURL(url); } catch (e) {} }, 4000);
+  }).catch(() => toast("Could not read the file"));
+}
+
+function askNotify() {
+  if (!("Notification" in window)) { toast("This browser does not support notifications"); return; }
+  if (Notification.permission === "granted") {
+    db.settings.notify = !db.settings.notify;
+    save(); toast(db.settings.notify ? "Notifications on" : "Notifications off"); render();
+    return;
+  }
+  Notification.requestPermission().then(p => {
+    db.settings.notify = (p === "granted");
+    save();
+    toast(p === "granted" ? "Notifications on" : "Permission not given");
+    render();
+  });
+}
+function notifyOnLoad() {
+  if (!db.settings || !db.settings.notify) return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+  const items = alertItems();
+  const urgent = items.filter(x => x.kind === "listed" || x.level === "high");
+  if (!urgent.length) return;
+  try {
+    new Notification("Chamber Diary — " + urgent.length + " to look at", {
+      body: urgent.slice(0, 4).map(x => "• " + x.text).join("\n"),
+      tag: "chamber-diary-daily"
+    });
+  } catch (e) {}
+}
+
+function noteForm(id) {
+  const c = getCase(id);
+  if (!c) return;
+  openModal({
+    title: "Add note — " + caseTitle(c),
+    body: field("Note", '<textarea name="text" style="min-height:120px" placeholder="Instructions, points for arguments, things to check…"></textarea>'),
+    submit: "Save note",
+    onSubmit: fd => {
+      const text = formVal(fd, "text");
+      if (!text) { closeModal(); return; }
+      c.notes = c.notes || [];
+      c.notes.push({ id: uid(), text, pinned: false, createdAt: new Date().toISOString() });
+      c.updatedAt = new Date().toISOString();
+      upsertCase(c);
+      closeModal();
+      ui.tab = "notes";
+      toast("Note saved");
+      render();
+    }
+  });
+}
+
+/* ---------------- printing ---------------- */
+function printCause(iso) {
+  let list = casesOn(iso);
+  if (ui.causeCourt) list = list.filter(c => (c.court || "") === ui.causeCourt);
+  if (ui.causeTag) list = list.filter(c => (c.tags || []).indexOf(ui.causeTag) !== -1);
+  const a = db.settings.advocate;
+  let h = '<div class="pr-sheet">';
+  h += '<div class="pr-head"><h2>CAUSE LIST — ' + esc(dayName(iso).toUpperCase()) + ", " + fmtDate(iso) + "</h2>";
+  h += '<div class="sub">' + (a.name ? esc(a.name) : "Chamber") + (a.enrolment ? " · Enrolment " + esc(a.enrolment) : "") + (a.phone ? " · " + esc(a.phone) : "") + "</div></div>";
+  if (!list.length) {
+    h += '<p style="text-align:center;font-style:italic">No matter listed on this date.</p>';
+  } else {
+    const byCourt = new Map();
+    list.forEach(c => { const k = c.court || "Court not set"; if (!byCourt.has(k)) byCourt.set(k, []); byCourt.get(k).push(c); });
+    Array.from(byCourt.keys()).sort().forEach(court => {
+      h += '<div class="pr-court">' + esc(court) + "</div>";
+      h += '<table class="pr"><thead><tr><th style="width:6%">Sr</th><th style="width:20%">Case no.</th><th style="width:32%">Party</th><th style="width:16%">Stage / purpose</th><th style="width:26%">Notes</th></tr></thead><tbody>';
+      byCourt.get(court).forEach((c, i) => {
+        h += "<tr><td>" + (i + 1) + "</td><td>" + esc(c.caseNo || "") + (c.cnr ? "<br><span style='font-size:8pt'>" + esc(c.cnr) + "</span>" : "") + "</td>";
+        h += "<td>" + esc(caseTitle(c)) + (c.room ? "<br><span style='font-size:8pt'>" + esc(c.room) + "</span>" : "") + "</td>";
+        h += "<td>" + esc(c.stage || "") + "</td><td class='note'><div class='pr-blank'></div><div class='pr-blank'></div></td></tr>";
+      });
+      h += "</tbody></table>";
+    });
+  }
+  h += '<div class="pr-foot"><span>' + list.length + " matter(s)</span><span>Printed " + fmtDate(todayISO()) + "</span></div>";
+  h += "</div>";
+  doPrint(h);
+}
+function printBrief(id) {
+  const c = getCase(id);
+  if (!c) return;
+  const a = db.settings.advocate;
+  let h = '<div class="pr-brief">';
+  h += '<div class="center b" style="font-size:14pt">IN THE ' + esc((c.court || "").toUpperCase()) + "</div>";
+  if (c.room) h += '<div class="center">' + esc(c.room) + "</div>";
+  h += '<div class="rule"></div>';
+  h += '<div class="center b">' + esc(c.caseNo || "") + "</div>";
+  if (c.cnr) h += '<div class="center" style="font-size:9.5pt">CNR: ' + esc(c.cnr) + "</div>";
+  h += '<div class="rule"></div>';
+  h += '<div>' + esc(c.client || "") + (c.ourSide ? "  … " + esc(c.ourSide) : "") + "</div>";
+  h += '<div class="center" style="margin:6pt 0">Versus</div>';
+  h += '<div>' + esc(c.opposite || "") + "</div>";
+  h += '<div class="rule"></div>';
+  h += '<div class="center b">' + esc((c.stage || "STAGE").toUpperCase()) + "</div>";
+  h += '<div class="rule"></div>';
+  h += '<div class="indent">' + esc(a.name || "Counsel for the " + (c.ourSide || "party")) + "</div>";
+  if (a.enrolment) h += '<div class="indent">Enrolment No. ' + esc(a.enrolment) + "</div>";
+  if (a.chamber) h += '<div class="indent">' + esc(a.chamber) + "</div>";
+  if (a.phone) h += '<div class="indent">Mob. ' + esc(a.phone) + "</div>";
+  h += "</div>";
+  doPrint(h);
+}
+function doPrint(inner) {
+  const area = $("#print-area");
+  area.innerHTML = inner;
+  setTimeout(() => { window.print(); }, 60);
+}
+function causeText(iso) {
+  const list = casesOn(iso);
+  const a = db.settings.advocate;
+  let out = "CAUSE LIST — " + dayName(iso) + ", " + fmtDate(iso) + "\n";
+  if (a.name) out += a.name + "\n";
+  out += "\n";
+  if (!list.length) { out += "No matter listed.\n"; return out; }
+  let court = null;
+  list.forEach((c, i) => {
+    if (c.court !== court) { court = c.court; out += "\n" + (court || "Court not set") + "\n"; }
+    out += (i + 1) + ". " + (c.caseNo ? c.caseNo + " — " : "") + caseTitle(c) + (c.stage ? " [" + c.stage + "]" : "") + (c.room ? " (" + c.room + ")" : "") + "\n";
+  });
+  return out;
+}
+function copyText(txt) {
+  const done = () => toast("Copied — paste into WhatsApp");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(done).catch(() => fallbackCopy(txt, done));
+  } else fallbackCopy(txt, done);
+}
+function fallbackCopy(txt, done) {
+  const ta = document.createElement("textarea");
+  ta.value = txt;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch (e) { toast("Copy not supported in this browser"); }
+  ta.remove();
+}
+
+/* ---------------- import / export ---------------- */
+function download(name, content, type) {
+  const blob = new Blob([content], { type: type || "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function exportJSON() {
+  const payload = { app: "Chamber Diary", version: 1, exportedAt: new Date().toISOString(), data: db };
+  download("chamber-diary-backup-" + todayISO() + ".json", JSON.stringify(payload, null, 2), "application/json");
+  toast("Backup downloaded");
+}
+function csvCell(v) {
+  const s = String(v == null ? "" : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function exportCSV() {
+  const cols = ["client","opposite","court","room","caseNo","cnr","stage","ourSide","nextDate","status","tags","clientPhone","feeNotes"];
+  let out = cols.join(",") + "\n";
+  db.cases.forEach(c => {
+    out += cols.map(k => csvCell(k === "tags" ? (c.tags || []).join("; ") : c[k])).join(",") + "\n";
+  });
+  download("chamber-diary-cases-" + todayISO() + ".csv", out, "text/csv;charset=utf-8");
+  toast("Cases exported");
+}
+/* ---------------- Google Calendar / .ics export ---------------- */
+function icsText(v) {
+  return String(v == null ? "" : v)
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+function icsFold(line) {
+  // RFC 5545 folding: keep every line within 75 octets (bytes, not characters)
+  const enc = new TextEncoder();
+  let parts = [], cur = "", curB = 0, first = true;
+  for (const ch of String(line)) {
+    const b = enc.encode(ch).length;
+    const limit = first ? 75 : 74; // continuation lines begin with one space
+    if (curB + b > limit) { parts.push(cur); cur = ""; curB = 0; first = false; }
+    cur += ch; curB += b;
+  }
+  parts.push(cur);
+  return parts[0] + parts.slice(1).map(x => "\r\n " + x).join("");
+}
+function icsStamp() {
+  return new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+}
+function icsSummary(c) {
+  let s = "";
+  if (c.caseNo) s += c.caseNo + " — ";
+  s += caseTitle(c);
+  if (c.stage) s += " (" + c.stage + ")";
+  return s;
+}
+function icsDescription(c) {
+  const bits = [];
+  if (c.court) bits.push("Court: " + c.court + (c.room ? ", " + c.room : ""));
+  if (c.caseNo) bits.push("Case no.: " + c.caseNo);
+  if (c.cnr) bits.push("CNR: " + c.cnr);
+  if (c.stage) bits.push("Stage / purpose: " + c.stage);
+  if (c.ourSide) bits.push("We appear for: " + c.ourSide);
+  if (c.tags && c.tags.length) bits.push("Tags: " + c.tags.join(", "));
+  bits.push("— from Chamber Diary");
+  return bits.join("\n");
+}
+function buildICS(includeReminder) {
+  const stamp = icsStamp();
+  const L = [];
+  L.push("BEGIN:VCALENDAR");
+  L.push("VERSION:2.0");
+  L.push("PRODID:-//Chamber Diary//Case Diary//EN");
+  L.push("CALSCALE:GREGORIAN");
+  L.push("METHOD:PUBLISH");
+  L.push("X-WR-CALNAME:Court Diary");
+  L.push("X-WR-TIMEZONE:Asia/Kolkata");
+  const list = db.cases.filter(c => c.nextDate).sort(sortByDateThenCourt);
+  list.forEach(c => {
+    const d = c.nextDate.replace(/-/g, "");
+    const e = isoAdd(c.nextDate, 1).replace(/-/g, "");
+    L.push("BEGIN:VEVENT");
+    L.push("UID:" + c.id + "@chamber-diary");
+    L.push("DTSTAMP:" + stamp);
+    L.push("DTSTART;VALUE=DATE:" + d);
+    L.push("DTEND;VALUE=DATE:" + e);
+    L.push(icsFold("SUMMARY:" + icsText(icsSummary(c))));
+    if (c.court || c.room) L.push(icsFold("LOCATION:" + icsText([c.court, c.room].filter(Boolean).join(", "))));
+    L.push(icsFold("DESCRIPTION:" + icsText(icsDescription(c))));
+    if (c.tags && c.tags.length) L.push(icsFold("CATEGORIES:" + icsText(c.tags.join(","))));
+    L.push("STATUS:CONFIRMED");
+    L.push("TRANSP:TRANSPARENT");
+    if (includeReminder) {
+      // all-day event: alarm 15h before midnight = 9:00 am the previous day
+      L.push("BEGIN:VALARM");
+      L.push("TRIGGER:-PT15H");
+      L.push("ACTION:DISPLAY");
+      L.push(icsFold("DESCRIPTION:" + icsText("Hearing tomorrow: " + caseTitle(c))));
+      L.push("END:VALARM");
+    }
+    L.push("END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return { text: L.join("\r\n") + "\r\n", count: list.length };
+}
+function exportSyncCases() {
+  const data = {
+    advocate: (db.settings.advocate && db.settings.advocate.name) || "",
+    court: "Punjab & Haryana High Court",
+    generated_at: new Date().toISOString(),
+    cases: activeCases().map(c => ({
+      id: c.id,
+      label: c.caseNo || caseTitle(c),
+      caseNo: c.caseNo || "",
+      client: c.client || "",
+      opposite: c.opposite || "",
+      court: c.court || "",
+      tags: c.tags || []
+    }))
+  };
+  download("cases.json", JSON.stringify(data, null, 2), "application/json");
+  toast(data.cases.length + " case(s) exported for the daily sync");
+}
+
+function exportICS() {
+  const built = buildICS(true);
+  if (!built.count) { toast("No case has a next date yet"); return; }
+  download("court-diary-" + todayISO() + ".ics", built.text, "text/calendar;charset=utf-8");
+  toast(built.count + " hearing(s) exported for Google Calendar");
+}
+
+function csvTemplate() {
+  const cols = ["client","opposite","court","caseNo","cnr","stage","ourSide","nextDate","tags","clientPhone","feeNotes"];
+  const row = ["Ram Kumar","State of Punjab","Punjab & Haryana High Court","CRR-1234-2024","PHHC010012342024","Arguments","Petitioner","2026-11-20","stay, criminal","9876543210","Fee 50,000"];
+  download("case-import-template.csv", cols.join(",") + "\n" + row.map(csvCell).join(",") + "\n", "text/csv;charset=utf-8");
+  toast("Template downloaded");
+}
+function parseCSV(text) {
+  const rows = [];
+  let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { cell += '"'; i++; }
+        else q = false;
+      } else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else if (ch === "\r") { /* skip */ }
+    else cell += ch;
+  }
+  if (cell.length || row.length) { row.push(cell); rows.push(row); }
+  return rows.filter(r => r.some(x => String(x).trim() !== ""));
+}
+function importCSV(text) {
+  const rows = parseCSV(text);
+  if (rows.length < 2) { toast("That file has no data rows"); return; }
+  const head = rows[0].map(x => x.trim().toLowerCase());
+  const idx = k => head.indexOf(k.toLowerCase());
+  const need = ["client"];
+  if (idx("client") === -1) { toast("CSV needs a 'client' column"); return; }
+  let added = 0;
+  rows.slice(1).forEach(r => {
+    const g = k => { const i = idx(k); return i === -1 ? "" : String(r[i] == null ? "" : r[i]).trim(); };
+    const client = g("client");
+    if (!client) return;
+    const c = normaliseCase({
+      id: uid(),
+      client,
+      opposite: g("opposite"),
+      court: g("court") || db.settings.courts[0] || "",
+      room: g("room"),
+      caseNo: g("caseNo") || g("caseno"),
+      cnr: g("cnr"),
+      stage: g("stage"),
+      ourSide: g("ourside") || g("ourSide"),
+      nextDate: (g("nextdate") || "").slice(0, 10),
+      status: (g("status") || "active").toLowerCase() === "disposed" ? "disposed" : "active",
+      tags: splitTags((g("tags") || "").replace(/;/g, ",")),
+      clientPhone: g("clientphone"),
+      feeNotes: g("feenotes"),
+      createdAt: new Date().toISOString()
+    });
+    db.cases.push(c);
+    added++;
+  });
+  save();
+  toast(added + " case(s) imported");
+  go("cases");
+}
+
+/* ---------------- sample data ---------------- */
+function loadSample() {
+  const t = todayISO();
+  const samples = [
+    { client: "Ram Kumar", opposite: "State of Punjab", court: "Punjab & Haryana High Court", room: "Court Room 3", caseNo: "CRR-1234-2024", cnr: "PHHC010012342024", stage: "Arguments", ourSide: "Petitioner", nextDate: t, tags: ["sample", "criminal"], clientPhone: "9876543210", feeNotes: "₹40,000 — ₹20,000 received" },
+    { client: "Suman Devi", opposite: "Gurmeet Singh", court: "District Court, Mohali", room: "Court of Civil Judge", caseNo: "CS/345/2023", cnr: "PBMH010034532023", stage: "Evidence", ourSide: "Plaintiff", nextDate: isoAdd(t, 2), tags: ["sample", "civil"] },
+    { client: "Aarav Traders", opposite: "Bank of India", court: "DRT-I, Chandigarh", room: "Court-I", caseNo: "OA/88/2022", cnr: "", stage: "Reply", ourSide: "Respondent", nextDate: isoAdd(t, 5), tags: ["sample", "drt"], feeNotes: "Fee on appearance" }
+  ];
+  samples.forEach(s => {
+    const c = normaliseCase(Object.assign({ id: uid(), createdAt: new Date().toISOString() }, s));
+    if (s === samples[0]) {
+      c.hearings = [{ id: uid(), date: isoAdd(t, -14), what: "Notice issued. Learned counsel for the respondent seeks time to file a reply.", purpose: "Arguments", nextDate: t, createdAt: new Date().toISOString() }];
+      c.orders = [{ id: uid(), date: isoAdd(t, -14), bench: "Hon'ble Mr. Justice A. B. Singh", summary: "Notice of motion. Mr. Sharma, learned counsel for the respondent, accepts notice and prays for time to file a reply. Adjourned to the next date. Interim order to continue till then.", link: "", read: false, createdAt: new Date().toISOString() }];
+      c.notes = [{ id: uid(), text: "Client to bring original agreement and the trial court record before the next date.", pinned: true, createdAt: new Date().toISOString() }];
+    }
+    db.cases.push(c);
+  });
+  save();
+  toast("3 sample cases added");
+  go("cases");
+}
+
+/* ---------------- actions ---------------- */
+function handleAction(el, ev) {
+  const a = el.getAttribute("data-action");
+  const id = el.getAttribute("data-id");
+  const date = el.getAttribute("data-date");
+  switch (a) {
+    case "new-case": newCase(); break;
+    case "edit-case": editCase(id); break;
+    case "open-case": ev.preventDefault(); go("case", { caseId: id, tab: "diary" }); break;
+    case "goto-cases": ev.preventDefault(); go("cases"); break;
+    case "goto-orders": go("orders"); break;
+    case "goto-cause": go("cause", { causeDate: date || todayISO() }); break;
+    case "record-hearing": recordHearing(id, date || null); break;
+    case "edit-hearing": recordHearing(id, null, el.getAttribute("data-hid")); break;
+    case "del-hearing": {
+      const c = getCase(id); if (!c) break;
+      const hid = el.getAttribute("data-hid");
+      if (!confirm("Delete this hearing entry?")) break;
+      c.hearings = (c.hearings || []).filter(x => x.id !== hid);
+      upsertCase(c); toast("Entry deleted"); render(); break;
+    }
+    case "add-order": orderForm(id); break;
+    case "edit-order": orderForm(id, el.getAttribute("data-oid")); break;
+    case "del-order": {
+      const c = getCase(id); if (!c) break;
+      const oid = el.getAttribute("data-oid");
+      if (!confirm("Delete this order entry?")) break;
+      c.orders = (c.orders || []).filter(x => x.id !== oid);
+      upsertCase(c); toast("Order deleted"); render(); break;
+    }
+    case "toggle-order": {
+      const c = getCase(id); if (!c) break;
+      const oid = el.getAttribute("data-oid");
+      const o = (c.orders || []).find(x => x.id === oid);
+      if (o) { o.read = !o.read; upsertCase(c); render(); }
+      break;
+    }
+    case "add-note": noteForm(id); break;
+    case "goto-tasks": go("tasks"); break;
+    case "goto-alerts": go("alerts"); break;
+    case "add-task": taskForm(id); break;
+    case "edit-task": taskForm(id, el.getAttribute("data-tid")); break;
+    case "toggle-task": {
+      const c = getCase(id); if (!c) break;
+      const t = (c.tasks || []).find(x => x.id === el.getAttribute("data-tid"));
+      if (t) { t.done = !t.done; t.doneAt = t.done ? new Date().toISOString() : ""; upsertCase(c); render(); }
+      break;
+    }
+    case "del-task": {
+      const c = getCase(id); if (!c) break;
+      if (!confirm("Delete this task?")) break;
+      c.tasks = (c.tasks || []).filter(x => x.id !== el.getAttribute("data-tid"));
+      upsertCase(c); render(); break;
+    }
+    case "upload-doc": {
+      const inp = document.getElementById("docFile");
+      if (!inp) break;
+      inp.setAttribute("data-case", id || "");
+      inp.click();
+      break;
+    }
+    case "open-doc": ev.preventDefault(); openDoc(el.getAttribute("data-doc")); break;
+    case "download-doc": downloadDoc(el.getAttribute("data-doc"), el.getAttribute("data-name")); break;
+    case "del-doc": {
+      const c = getCase(id); if (!c) break;
+      const did = el.getAttribute("data-doc");
+      if (!confirm("Remove this document from the app? The original on your computer is not touched.")) break;
+      c.docs = (c.docs || []).filter(x => x.id !== did);
+      upsertCase(c); idbDel(did); toast("Document removed"); render(); break;
+    }
+    case "add-fee": feeForm(id); break;
+    case "del-fee": {
+      const c = getCase(id); if (!c) break;
+      if (!confirm("Delete this fee entry?")) break;
+      c.fees = (c.fees || []).filter(x => x.id !== el.getAttribute("data-fid"));
+      upsertCase(c); render(); break;
+    }
+    case "filter-client": ev.preventDefault();
+      ui.q = el.getAttribute("data-name") || ""; ui.statusFilter = "all"; go("cases"); break;
+    case "open-case-fees": go("case", { caseId: id, tab: "fees" }); break;
+    case "notify-ask": askNotify(); break;
+    case "pin-note": {
+      const c = getCase(id); if (!c) break;
+      const n = (c.notes || []).find(x => x.id === el.getAttribute("data-nid"));
+      if (n) { n.pinned = !n.pinned; upsertCase(c); render(); }
+      break;
+    }
+    case "del-note": {
+      const c = getCase(id); if (!c) break;
+      if (!confirm("Delete this note?")) break;
+      c.notes = (c.notes || []).filter(x => x.id !== el.getAttribute("data-nid"));
+      upsertCase(c); toast("Note deleted"); render(); break;
+    }
+    case "tab": ui.tab = el.getAttribute("data-tab"); render(); break;
+    case "print-cause": printCause(date || ui.causeDate || todayISO()); break;
+    case "copy-cause": copyText(causeText(date || ui.causeDate || todayISO())); break;
+    case "print-brief": printBrief(id); break;
+    case "cause-today": ui.causeDate = todayISO(); render(); break;
+    case "cause-tomorrow": ui.causeDate = isoAdd(todayISO(), 1); render(); break;
+    case "toggle-order-view": ui.showAllOrders = !ui.showAllOrders; render(); break;
+    case "toggle-status": {
+      const c = getCase(id); if (!c) break;
+      c.status = c.status === "disposed" ? "active" : "disposed";
+      upsertCase(c); toast("Marked " + c.status); render(); break;
+    }
+    case "delete-case": {
+      const c = getCase(id); if (!c) break;
+      if (!confirm("Delete \"" + caseTitle(c) + "\" and all its diary, orders and notes? This cannot be undone.")) break;
+      db.cases = db.cases.filter(x => x.id !== id);
+      save(); toast("Case deleted"); go("cases"); break;
+    }
+    case "close-modal": closeModal(); break;
+    case "overlay": if (ev.target === el) closeModal(); break;
+    case "save-advocate": {
+      db.settings.advocate = {
+        name: ($("#advName") || {}).value || "",
+        enrolment: ($("#advEnrol") || {}).value || "",
+        chamber: ($("#advChamber") || {}).value || "",
+        phone: ($("#advPhone") || {}).value || ""
+      };
+      save(); toast("Details saved"); render(); break;
+    }
+    case "add-court": {
+      const inp = $("#newCourt");
+      const v = inp ? inp.value.trim() : "";
+      if (!v) break;
+      if (db.settings.courts.indexOf(v) === -1) db.settings.courts.push(v);
+      save(); toast("Court added"); render(); break;
+    }
+    case "del-court": {
+      const i = Number(el.getAttribute("data-i"));
+      const name = db.settings.courts[i];
+      if (!name) break;
+      const used = db.cases.filter(c => c.court === name).length;
+      if (used && !confirm(used + " case(s) use this court. Remove it from the list anyway?")) break;
+      db.settings.courts.splice(i, 1);
+      save(); render(); break;
+    }
+    case "export-json": exportJSON(); break;
+    case "export-csv": exportCSV(); break;
+    case "csv-template": csvTemplate(); break;
+    case "export-ics": exportICS(); break;
+    case "export-sync-cases": exportSyncCases(); break;
+    case "reload-sync": loadCourtSync().then(() => { toast("Court data refreshed"); render(); }); break;
+    case "export-ics-norem": {
+      const built = buildICS(false);
+      if (!built.count) { toast("No case has a next date yet"); break; }
+      download("court-diary-" + todayISO() + ".ics", built.text, "text/calendar;charset=utf-8");
+      toast(built.count + " hearing(s) exported");
+      break;
+    }
+    case "import-json": { const f = $("#fileJson"); if (f) f.click(); break; }
+    case "import-csv": { const f = $("#fileCsv"); if (f) f.click(); break; }
+    case "load-sample": loadSample(); break;
+    case "wipe": {
+      if (!confirm("Erase every case, hearing, order and note on this device?")) break;
+      if (!confirm("Last check — this cannot be undone. Continue?")) break;
+      db = blankDB(); save(); toast("All data erased"); go("today"); break;
+    }
+    default: break;
+  }
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener("click", ev => {
+  const el = ev.target.closest("[data-action],[data-nav]");
+  if (!el) return;
+  const nav = el.getAttribute("data-nav");
+  if (nav) { go(nav); return; }
+  handleAction(el, ev);
+});
+document.addEventListener("change", ev => {
+  const el = ev.target;
+  const kind = el.getAttribute("data-change");
+  if (kind === "cause-date") { ui.causeDate = el.value || todayISO(); render(); }
+  else if (kind === "cause-court") { ui.causeCourt = el.value; render(); }
+  else if (kind === "cause-tag") { ui.causeTag = el.value; render(); }
+  else if (kind === "court-filter") { ui.courtFilter = el.value; render(); }
+  else if (kind === "status-filter") { ui.statusFilter = el.value; render(); }
+  else if (kind === "task-filter") { ui.taskFilter = el.value; render(); }
+  else if (el.getAttribute("data-file") === "doc") {
+    const caseId = el.getAttribute("data-case");
+    const c = getCase(caseId);
+    const files = Array.from(el.files || []);
+    const kindEl = document.getElementById("docKind");
+    const kind = kindEl ? kindEl.value : "Other";
+    el.value = "";
+    if (!c || !files.length) return;
+    (async () => {
+      let added = 0, failed = 0;
+      for (const f of files) {
+        if (f.size > 25 * 1024 * 1024) { failed++; continue; }
+        const meta2 = { id: uid(), name: f.name, type: f.type || "application/octet-stream", size: f.size, kind, addedAt: new Date().toISOString() };
+        try { await idbPut({ id: meta2.id, caseId: c.id, blob: f, name: f.name, type: meta2.type }); }
+        catch (e) { failed++; continue; }
+        c.docs = c.docs || []; c.docs.push(meta2); added++;
+      }
+      if (added) upsertCase(c);
+      render();
+      if (!added && failed) toast("Could not store it — try opening the app from its https address");
+      else if (failed) toast(added + " saved · " + failed + " failed (max 25 MB each)");
+      else toast(added + " document(s) added");
+    })();
+  }
+  else if (el.getAttribute("data-file") === "json") {
+    const f = el.files && el.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const data = parsed.data && parsed.data.cases ? parsed.data : parsed;
+        if (!data || !Array.isArray(data.cases)) throw new Error("bad");
+        if (!confirm("Restore " + data.cases.length + " case(s) from this backup? It will replace what is on this device now.")) return;
+        db = Object.assign(blankDB(), data);
+        db.settings = Object.assign(blankDB().settings, data.settings || {});
+        db.cases.forEach(normaliseCase);
+        save(); toast("Backup restored"); go("today");
+      } catch (e) { toast("That file is not a Chamber Diary backup"); }
+    };
+    reader.readAsText(f);
+  }
+  else if (el.getAttribute("data-file") === "csv") {
+    const f = el.files && el.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => importCSV(String(reader.result));
+    reader.readAsText(f);
+  }
+});
+document.addEventListener("input", ev => {
+  const el = ev.target;
+  if (el.getAttribute("data-input") === "search") {
+    ui.q = el.value;
+    const pos = el.selectionStart;
+    render();
+    const again = $("#caseSearch");
+    if (again) { again.focus(); try { again.setSelectionRange(pos, pos); } catch (e) {} }
+  }
+});
+document.addEventListener("keydown", ev => {
+  if (ev.key === "Escape" && $("#modal-root").innerHTML) closeModal();
+  if (ev.key === "/" && !/input|textarea|select/i.test((document.activeElement || {}).tagName || "")) {
+    const s = $("#caseSearch");
+    if (s) { ev.preventDefault(); s.focus(); }
+  }
+});
+window.addEventListener("hashchange", () => {
+  const r = parseHash();
+  if (r.route === "case") { ui.route = "case"; ui.caseId = r.id; ui.tab = ui.tab || "diary"; }
+  else ui.route = r.route;
+  render();
+});
+
+/* ---------------- boot ---------------- */
+load();
+const start = parseHash();
+if (start.route === "case") { ui.route = "case"; ui.caseId = start.id; ui.tab = "diary"; }
+else ui.route = start.route;
+ui.causeDate = ui.causeDate || todayISO();
+render();
+loadCourtSync();
+notifyOnLoad();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
