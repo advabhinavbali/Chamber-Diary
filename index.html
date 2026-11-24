@@ -1541,7 +1541,7 @@ function viewSettings() {
   h += "</div></div></div>";
 
   h += '<div class="card"><div class="card__head"><h3>Google Calendar</h3><span class="hint">reminders on your phone</span></div><div class="card__body">';
-  h += '<p class="hint" style="margin-top:0">Download a calendar file with every dated hearing as an all-day event, plus a reminder at 9 am the previous day. Then in Google Calendar on a laptop:</p>';
+  h += '<p class="hint" style="margin-top:0">Download a calendar file with every dated hearing <b>and every to-do task that has a due date</b>, each as an all-day event with a reminder at 9 am the previous day. Then in Google Calendar on a laptop:</p>';
   h += '<ol class="hint" style="margin:0 0 12px;padding-left:20px;line-height:1.8">';
   h += '<li>Settings (gear) → <b>Import &amp; export</b> → Import</li>';
   h += '<li>Choose the downloaded <span class="mono">.ics</span> file, pick a calendar — use a separate one called "Court Diary" so you can clear it in one go — then Import</li>';
@@ -2105,8 +2105,35 @@ function buildICS(includeReminder) {
     }
     L.push("END:VEVENT");
   });
+  // tasks with a due date become calendar events too, so reminders come from Calendar
+  const tsk = openTasks().filter(x => x.t.due);
+  tsk.forEach(x => {
+    const d = x.t.due.replace(/-/g, "");
+    const e = isoAdd(x.t.due, 1).replace(/-/g, "");
+    L.push("BEGIN:VEVENT");
+    L.push("UID:task-" + x.t.id + "@chamber-diary");
+    L.push("DTSTAMP:" + stamp);
+    L.push("DTSTART;VALUE=DATE:" + d);
+    L.push("DTEND;VALUE=DATE:" + e);
+    L.push(icsFold("SUMMARY:" + icsText("To do: " + x.t.text + " — " + caseTitle(x.c))));
+    L.push(icsFold("DESCRIPTION:" + icsText(
+      "Case: " + caseTitle(x.c) + (x.c.caseNo ? " (" + x.c.caseNo + ")" : "") +
+      "\nCourt: " + (x.c.court || "—") +
+      "\nPriority: " + (x.t.priority || "normal") + "\n— from Chamber Diary")));
+    if (x.c.court) L.push(icsFold("LOCATION:" + icsText(x.c.court)));
+    L.push("STATUS:CONFIRMED");
+    L.push("TRANSP:TRANSPARENT");
+    if (includeReminder) {
+      L.push("BEGIN:VALARM");
+      L.push("TRIGGER:-PT15H");
+      L.push("ACTION:DISPLAY");
+      L.push(icsFold("DESCRIPTION:" + icsText("Due tomorrow: " + x.t.text)));
+      L.push("END:VALARM");
+    }
+    L.push("END:VEVENT");
+  });
   L.push("END:VCALENDAR");
-  return { text: L.join("\r\n") + "\r\n", count: list.length };
+  return { text: L.join("\r\n") + "\r\n", count: list.length + tsk.length };
 }
 function exportSyncCases() {
   const data = {
@@ -2131,7 +2158,7 @@ function exportICS() {
   const built = buildICS(true);
   if (!built.count) { toast("No case has a next date yet"); return; }
   download("court-diary-" + todayISO() + ".ics", built.text, "text/calendar;charset=utf-8");
-  toast(built.count + " hearing(s) exported for Google Calendar");
+  toast(built.count + " event(s) exported for Google Calendar");
 }
 
 function csvTemplate() {
