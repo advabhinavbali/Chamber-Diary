@@ -201,8 +201,13 @@ def name_hit(needle, hay):
     hay = (hay or "").upper()
     return all(w in hay for w in words)
 
-def match_entries(entries, cases):
+def name_tokens(name):
+    """Words of 4+ letters from a name, for loose matching against the advocate column."""
+    return [w for w in re.split(r"[^A-Za-z]+", (name or "").upper()) if len(w) >= 4]
+
+def match_entries(entries, cases, advocate_name=""):
     hits = []
+    ntoks = name_tokens(advocate_name)
     for e in entries:
         e_cases_norm = [norm(c) for c in e["cases"]]
         for c in cases:
@@ -227,6 +232,22 @@ def match_entries(entries, cases):
                     "matched_by": why, "page": e["page"], "source": e["source"],
                     "case_id": c.get("id", ""), "case_label": c.get("label", "") or c.get("caseNo", ""),
                 })
+    # ---- match by YOUR NAME as counsel: no case numbers needed ----
+    if len(ntoks) >= 2:
+        for e in entries:
+            adv = (e["advocate"] or "").upper()
+            if all(t in adv for t in ntoks):
+                hits.append({
+                    "date": e["date"], "item": e["item"], "court_no": e["court_no"],
+                    "bench": e["bench"], "list_kind": e["list_kind"],
+                    "list_label": e["list_label"], "district": e["district"],
+                    "parties": e["parties"], "advocate": e["advocate"],
+                    "case_no_in_list": ", ".join(e["cases"]),
+                    "matched_by": "your name as counsel", "by_name": True,
+                    "page": e["page"], "source": e["source"],
+                    "case_id": "", "case_label": "",
+                })
+
     # de-duplicate: same case + same date + same item
     seen, out = set(), []
     for h in hits:
@@ -285,10 +306,12 @@ def build_text(hits, dates):
 def load_cases():
     p = os.path.join(HERE, "cases.json")
     if not os.path.exists(p):
-        sys.exit("cases.json not found next to court_sync.py")
+        return [], ""
     with open(p, encoding="utf-8") as f:
         data = json.load(f)
-    return data.get("cases", data) if isinstance(data, dict) else data
+    if isinstance(data, list):
+        return data, ""
+    return data.get("cases", []) or [], (data.get("advocate") or "").strip()
 
 def main():
     ap = argparse.ArgumentParser()
@@ -297,6 +320,7 @@ def main():
     ap.add_argument("--pdf", help="parse a local PDF instead of downloading")
     ap.add_argument("--list-type", default="B", help="B=complete, 1=all, R=regular…")
     ap.add_argument("--out", default=HERE)
+    ap.add_argument("--name", help="your name as printed in the cause list, e.g. \"Abhinav Bali\"")
     a = ap.parse_args()
 
     if a.date:
@@ -305,7 +329,9 @@ def main():
         today = today_ist()
         dates = [today + dt.timedelta(days=i) for i in range(a.days)]
 
-    cases = load_cases()
+    cases, advocate_name = load_cases()
+    if a.name:
+        advocate_name = a.name
     all_entries, hits, used = [], [], []
 
     if a.pdf:
@@ -340,13 +366,14 @@ def main():
     for e in all_entries:
         if not e["bench"]:
             e["bench"] = ""
-    hits = match_entries(all_entries, cases)
+    hits = match_entries(all_entries, cases, advocate_name)
     os.makedirs(a.out, exist_ok=True)
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "court": "Punjab & Haryana High Court",
         "dates_pulled": used,
         "entries_scanned": len(all_entries),
+        "advocate": advocate_name,
         "matches": hits,
     }
     with open(os.path.join(a.out, "data.json"), "w", encoding="utf-8") as f:
@@ -355,7 +382,8 @@ def main():
         f.write(build_ics(hits))
     with open(os.path.join(a.out, "causelist.txt"), "w", encoding="utf-8") as f:
         f.write(build_text(hits, used))
-    print(f"entries scanned: {len(all_entries)} | your matches: {len(hits)}")
+    print(f"entries scanned: {len(all_entries)} | your matches: {len(hits)}"
+          + (f" (looking for '{advocate_name}')" if advocate_name else ""))
     for h in hits:
         print(f"  {h['date']} CR {h['court_no']} item {h['item']} — {h['case_label'] or h['case_no_in_list']} ({h['matched_by']})")
 

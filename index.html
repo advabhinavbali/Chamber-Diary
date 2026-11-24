@@ -843,7 +843,7 @@ function viewToday() {
       h += '<tr><td class="num nowrap"' + (isToday ? ' style="color:var(--terra);font-weight:700"' : "") + ">" + fmtDate(m.date) + '</td>';
       h += '<td class="num">' + esc(String(m.item)) + "</td>";
       h += '<td class="nowrap">CR NO ' + esc(m.court_no || "—") + "</td>";
-      h += "<td>" + esc(m.case_label || m.case_no_in_list || m.parties || "—") + '<div class="case-meta">' + esc((m.parties || "").slice(0, 90)) + "</div></td>";
+      h += "<td>" + (m.by_name ? '<span class="badge badge--gold" title="found by your name in the advocate column — check the party">by name</span> ' : "") + esc(m.case_label || m.case_no_in_list || m.parties || "—") + '<div class="case-meta">' + esc((m.parties || "").slice(0, 90)) + "</div></td>";
       h += '<td class="hint">' + esc(m.bench || "—") + "</td></tr>";
     });
     h += "</tbody></table></div></div></div>";
@@ -1324,7 +1324,7 @@ function viewSchedule() {
     b.s.forEach(m => {
       h += '<div class="order-row" style="background:var(--navy-soft)"><div class="order-body"><div class="order-top">';
       h += '<span class="badge badge--navy">Court list</span><span class="order-date">CR NO ' + esc(m.court_no || '—') + ' · item ' + esc(String(m.item)) + '</span></div>';
-      h += '<div class="order-text">' + esc(m.case_label || m.case_no_in_list) + ' — ' + esc((m.parties || '').slice(0, 110)) + '</div>';
+      h += '<div class="order-text">' + (m.by_name ? '<span class="badge badge--gold">by name</span> ' : "") + esc(m.case_label || m.case_no_in_list) + ' — ' + esc((m.parties || '').slice(0, 110)) + '</div>';
       h += '<div class="hint">' + esc(m.bench || '') + '</div></div></div>';
     });
     b.h.forEach(c => {

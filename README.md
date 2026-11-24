@@ -50,24 +50,30 @@ This is the only file with a folder in its name, so create it by typing, not upl
 GitHub will create the two folders by itself. Paste the contents of
 `court-sync.yml` from this zip into the big box, then **Commit changes**.
 
-### 3. Put your cases in
-Click `cases.json` → pencil → replace the example with your matters:
+### 3. Your name — the only line you must fill
+
+Open `cases.json` → pencil → set `"advocate"` to your name exactly as it is printed in
+the cause list:
 
 ```json
-{
-  "advocate": "Abhinav Bali",
-  "cases": [
-    { "id": "1", "label": "CWP-1234-2024", "caseNo": "CWP-1234-2024",
-      "client": "Ram Kumar", "opposite": "State of Punjab" }
-  ]
-}
+{ "advocate": "Abhinav Bali", "cases": [] }
 ```
 
-Easier: open the app → **Settings → Court sync → Export cases.json**, then upload
-that file over `cases.json`.
+That is enough. The sync then finds **every matter where your name appears in the
+advocate column** — no case numbers needed, whether you have five cases or five
+hundred. Leave `"cases": []` empty; you can add individual cases later, in the app.
 
-`caseNo` must match the court's spelling: `CWP-1234-2024`, `CRM-M-12345-2024`,
-`CRA-D-456-2023`. A case with no `caseNo` is matched on party names instead.
+Two ways to be found, and you can use both:
+
+| In `cases.json` | What it matches |
+|---|---|
+| `"advocate": "Abhinav Bali"` | every listing where your name is printed as counsel (badged *by name* in the app — confirm the party) |
+| `"cases": [{ "caseNo": "CWP-1234-2024" }]` | one specific case, matched exactly on the case number |
+
+**You never type case numbers by hand.** Add cases in the app as you go
+(Cases → + New case), then **Settings → Court sync → Export cases.json** and upload
+that file over `cases.json`. If you already have a list in Excel, use
+**Settings → Import cases (.csv)** with the CSV template.
 
 ### 4. Switch the web page on
 **Settings → Pages** → Source: **Deploy from a branch** → Branch **main**,

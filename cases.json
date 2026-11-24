@@ -1,16 +1,6 @@
 {
-  "_how_to_use": "This is the list the daily sync matches against. Edit it by hand, or press 'Export cases.json' in the app's Settings and replace this file with that download. 'caseNo' is what matters most — matching on the case number is exact. Cases without a caseNo are matched on the two party names.",
+  "_how_to_use": "Two ways to be found in the daily cause list. EITHER put your name once in 'advocate' (matches every matter where that name appears as counsel - no case numbers needed), OR list individual cases below with their caseNo. You can use both. Nothing here is typed by hand if you press 'Export cases.json' in the app's Settings and upload that file instead.",
   "advocate": "Abhinav Bali",
   "court": "Punjab & Haryana High Court",
-  "cases": [
-    {
-      "id": "example-1",
-      "label": "CWP-1234-2024",
-      "caseNo": "CWP-1234-2024",
-      "client": "Client name as it appears in the cause list",
-      "opposite": "State of Punjab",
-      "court": "Punjab & Haryana High Court",
-      "tags": ["example"]
-    }
-  ]
+  "cases": []
 }

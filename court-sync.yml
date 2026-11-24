@@ -1,8 +1,8 @@
 name: Court diary sync
 
-# Pulls the P&H High Court cause lists, finds your matters, writes
-# docs/data.json + docs/diary.ics + docs/causelist.txt, and commits them.
-# Runs twice a day in IST: ~06:15 and ~19:45. Also runnable by hand.
+# Pulls the P&H High Court cause lists, finds the matters that are yours,
+# and writes data.json + diary.ics + causelist.txt at the top of the repo.
+# Runs twice a day (06:15 and 19:45 IST) and can be run by hand.
 
 on:
   schedule:
@@ -40,7 +40,7 @@ jobs:
         run: |
           git config user.name  "court-diary-sync"
           git config user.email "actions@users.noreply.github.com"
-          git add docs/data.json docs/diary.ics docs/causelist.txt
+          git add data.json diary.ics causelist.txt
           if git diff --staged --quiet; then
             echo "Nothing changed since the last run."
           else
