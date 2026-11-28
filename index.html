@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#faf7f3">
-<link rel="manifest" href="manifest.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Chamber Diary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2322405f'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='26' font-weight='bold' fill='%23faf7f3' text-anchor='middle'%3ECD%3C/text%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2322405f'/%3E%3Ctext x='32' y='43' font-family='Georgia,serif' font-size='26' font-weight='bold' fill='%23faf7f3' text-anchor='middle'%3ECD%3C/text%3E%3C/svg%3E">
 <title>Chamber Diary — Case &amp; Cause List Manager</title>
 <style>
@@ -409,6 +409,365 @@ const DEFAULT_COURTS = [
   "NCDRC, New Delhi"
 ];
 
+/* ---- court / forum list for the case form (searchable, free-typing allowed) ---- */
+const COURT_LIST = [
+  "Appellate Tribunal for Electricity (APTEL), New Delhi",
+  "Appellate Tribunal under PMLA / SAFEMA, New Delhi",
+  "Armed Forces Tribunal (AFT), Chandigarh",
+  "Armed Forces Tribunal (AFT), Guwahati",
+  "Armed Forces Tribunal (AFT), Jaipur",
+  "Armed Forces Tribunal (AFT), Kochi",
+  "Armed Forces Tribunal (AFT), Lucknow",
+  "Armed Forces Tribunal (AFT), Mumbai",
+  "Armed Forces Tribunal (AFT), Principal Bench, New Delhi",
+  "Armed Forces Tribunal (AFT), Srinagar",
+  "Authority for Advance Rulings (Income Tax), New Delhi",
+  "Central Administrative Tribunal (CAT), Ahmedabad",
+  "Central Administrative Tribunal (CAT), Allahabad",
+  "Central Administrative Tribunal (CAT), Bengaluru",
+  "Central Administrative Tribunal (CAT), Bhopal",
+  "Central Administrative Tribunal (CAT), Chandigarh",
+  "Central Administrative Tribunal (CAT), Chennai",
+  "Central Administrative Tribunal (CAT), Cuttack",
+  "Central Administrative Tribunal (CAT), Ernakulam",
+  "Central Administrative Tribunal (CAT), Guwahati",
+  "Central Administrative Tribunal (CAT), Hyderabad",
+  "Central Administrative Tribunal (CAT), Jaipur",
+  "Central Administrative Tribunal (CAT), Jammu",
+  "Central Administrative Tribunal (CAT), Jodhpur",
+  "Central Administrative Tribunal (CAT), Kolkata",
+  "Central Administrative Tribunal (CAT), Lucknow",
+  "Central Administrative Tribunal (CAT), Mumbai",
+  "Central Administrative Tribunal (CAT), Patna",
+  "Central Administrative Tribunal (CAT), Principal Bench, New Delhi",
+  "Central Administrative Tribunal (CAT), Srinagar",
+  "Competition Commission of India (CCI), New Delhi",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Ahmedabad",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Allahabad",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Bengaluru",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Chandigarh",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Chennai",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Hyderabad",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Kolkata",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), Mumbai",
+  "Customs, Excise and Service Tax Appellate Tribunal (CESTAT), New Delhi",
+  "DRT-I, Chandigarh",
+  "DRT-II, Chandigarh",
+  "DRT-III, Chandigarh",
+  "Debts Recovery Appellate Tribunal (DRAT), Allahabad",
+  "Debts Recovery Appellate Tribunal (DRAT), Chennai",
+  "Debts Recovery Appellate Tribunal (DRAT), Delhi",
+  "Debts Recovery Appellate Tribunal (DRAT), Kolkata",
+  "Debts Recovery Appellate Tribunal (DRAT), Mumbai",
+  "Debts Recovery Tribunal (DRT), Ahmedabad",
+  "Debts Recovery Tribunal (DRT), Allahabad",
+  "Debts Recovery Tribunal (DRT), Aurangabad",
+  "Debts Recovery Tribunal (DRT), Bengaluru",
+  "Debts Recovery Tribunal (DRT), Chandigarh",
+  "Debts Recovery Tribunal (DRT), Chennai",
+  "Debts Recovery Tribunal (DRT), Coimbatore",
+  "Debts Recovery Tribunal (DRT), Cuttack",
+  "Debts Recovery Tribunal (DRT), Dehradun",
+  "Debts Recovery Tribunal (DRT), Delhi-I",
+  "Debts Recovery Tribunal (DRT), Delhi-II",
+  "Debts Recovery Tribunal (DRT), Delhi-III",
+  "Debts Recovery Tribunal (DRT), Delhi-IV",
+  "Debts Recovery Tribunal (DRT), Ernakulam",
+  "Debts Recovery Tribunal (DRT), Guwahati",
+  "Debts Recovery Tribunal (DRT), Hyderabad",
+  "Debts Recovery Tribunal (DRT), Jabalpur",
+  "Debts Recovery Tribunal (DRT), Jaipur",
+  "Debts Recovery Tribunal (DRT), Kolkata",
+  "Debts Recovery Tribunal (DRT), Lucknow",
+  "Debts Recovery Tribunal (DRT), Madurai",
+  "Debts Recovery Tribunal (DRT), Mumbai-I",
+  "Debts Recovery Tribunal (DRT), Mumbai-II",
+  "Debts Recovery Tribunal (DRT), Mumbai-III",
+  "Debts Recovery Tribunal (DRT), Nagpur",
+  "Debts Recovery Tribunal (DRT), Patna",
+  "Debts Recovery Tribunal (DRT), Pune",
+  "Debts Recovery Tribunal (DRT), Ranchi",
+  "Debts Recovery Tribunal (DRT), Siliguri",
+  "Debts Recovery Tribunal (DRT), Visakhapatnam",
+  "District & Sessions Court, Ambala (Haryana)",
+  "District & Sessions Court, Amritsar (Punjab)",
+  "District & Sessions Court, Barnala (Punjab)",
+  "District & Sessions Court, Bathinda (Punjab)",
+  "District & Sessions Court, Bhiwani (Haryana)",
+  "District & Sessions Court, Central Delhi",
+  "District & Sessions Court, Chandigarh",
+  "District & Sessions Court, Charkhi Dadri (Haryana)",
+  "District & Sessions Court, East Delhi",
+  "District & Sessions Court, Faridabad (Haryana)",
+  "District & Sessions Court, Faridkot (Punjab)",
+  "District & Sessions Court, Fatehabad (Haryana)",
+  "District & Sessions Court, Fatehgarh Sahib (Punjab)",
+  "District & Sessions Court, Fazilka (Punjab)",
+  "District & Sessions Court, Ferozepur (Punjab)",
+  "District & Sessions Court, Gurdaspur (Punjab)",
+  "District & Sessions Court, Gurugram (Haryana)",
+  "District & Sessions Court, Hisar (Haryana)",
+  "District & Sessions Court, Hoshiarpur (Punjab)",
+  "District & Sessions Court, Jalandhar (Punjab)",
+  "District & Sessions Court, Jhajjar (Haryana)",
+  "District & Sessions Court, Jind (Haryana)",
+  "District & Sessions Court, Kaithal (Haryana)",
+  "District & Sessions Court, Kapurthala (Punjab)",
+  "District & Sessions Court, Karnal (Haryana)",
+  "District & Sessions Court, Kurukshetra (Haryana)",
+  "District & Sessions Court, Ludhiana (Punjab)",
+  "District & Sessions Court, Mahendragarh (Haryana)",
+  "District & Sessions Court, Malerkotla (Punjab)",
+  "District & Sessions Court, Mansa (Punjab)",
+  "District & Sessions Court, Moga (Punjab)",
+  "District & Sessions Court, New Delhi",
+  "District & Sessions Court, North Delhi",
+  "District & Sessions Court, North-East Delhi",
+  "District & Sessions Court, North-West Delhi",
+  "District & Sessions Court, Nuh (Haryana)",
+  "District & Sessions Court, Palwal (Haryana)",
+  "District & Sessions Court, Panchkula (Haryana)",
+  "District & Sessions Court, Panipat (Haryana)",
+  "District & Sessions Court, Pathankot (Punjab)",
+  "District & Sessions Court, Patiala (Punjab)",
+  "District & Sessions Court, Rewari (Haryana)",
+  "District & Sessions Court, Rohtak (Haryana)",
+  "District & Sessions Court, Rupnagar (Punjab)",
+  "District & Sessions Court, Sahibzada Ajit Singh Nagar (Mohali) (Punjab)",
+  "District & Sessions Court, Sangrur (Punjab)",
+  "District & Sessions Court, Shahdara",
+  "District & Sessions Court, Shahid Bhagat Singh Nagar (Nawanshahr) (Punjab)",
+  "District & Sessions Court, Sirsa (Haryana)",
+  "District & Sessions Court, Sonipat (Haryana)",
+  "District & Sessions Court, South Delhi",
+  "District & Sessions Court, South-East Delhi",
+  "District & Sessions Court, South-West Delhi",
+  "District & Sessions Court, Sri Muktsar Sahib (Punjab)",
+  "District & Sessions Court, Tarn Taran (Punjab)",
+  "District & Sessions Court, West Delhi",
+  "District & Sessions Court, Yamunanagar (Haryana)",
+  "District Consumer Commission, Chandigarh",
+  "District Consumer Disputes Redressal Commission, Ambala (Haryana)",
+  "District Consumer Disputes Redressal Commission, Amritsar (Punjab)",
+  "District Consumer Disputes Redressal Commission, Barnala (Punjab)",
+  "District Consumer Disputes Redressal Commission, Bathinda (Punjab)",
+  "District Consumer Disputes Redressal Commission, Bhiwani (Haryana)",
+  "District Consumer Disputes Redressal Commission, Central Delhi",
+  "District Consumer Disputes Redressal Commission, Chandigarh",
+  "District Consumer Disputes Redressal Commission, Charkhi Dadri (Haryana)",
+  "District Consumer Disputes Redressal Commission, East Delhi",
+  "District Consumer Disputes Redressal Commission, Faridabad (Haryana)",
+  "District Consumer Disputes Redressal Commission, Faridkot (Punjab)",
+  "District Consumer Disputes Redressal Commission, Fatehabad (Haryana)",
+  "District Consumer Disputes Redressal Commission, Fatehgarh Sahib (Punjab)",
+  "District Consumer Disputes Redressal Commission, Fazilka (Punjab)",
+  "District Consumer Disputes Redressal Commission, Ferozepur (Punjab)",
+  "District Consumer Disputes Redressal Commission, Gurdaspur (Punjab)",
+  "District Consumer Disputes Redressal Commission, Gurugram (Haryana)",
+  "District Consumer Disputes Redressal Commission, Hisar (Haryana)",
+  "District Consumer Disputes Redressal Commission, Hoshiarpur (Punjab)",
+  "District Consumer Disputes Redressal Commission, Jalandhar (Punjab)",
+  "District Consumer Disputes Redressal Commission, Jhajjar (Haryana)",
+  "District Consumer Disputes Redressal Commission, Jind (Haryana)",
+  "District Consumer Disputes Redressal Commission, Kaithal (Haryana)",
+  "District Consumer Disputes Redressal Commission, Kapurthala (Punjab)",
+  "District Consumer Disputes Redressal Commission, Karnal (Haryana)",
+  "District Consumer Disputes Redressal Commission, Kurukshetra (Haryana)",
+  "District Consumer Disputes Redressal Commission, Ludhiana (Punjab)",
+  "District Consumer Disputes Redressal Commission, Mahendragarh (Haryana)",
+  "District Consumer Disputes Redressal Commission, Malerkotla (Punjab)",
+  "District Consumer Disputes Redressal Commission, Mansa (Punjab)",
+  "District Consumer Disputes Redressal Commission, Moga (Punjab)",
+  "District Consumer Disputes Redressal Commission, New Delhi",
+  "District Consumer Disputes Redressal Commission, North Delhi",
+  "District Consumer Disputes Redressal Commission, North-East Delhi",
+  "District Consumer Disputes Redressal Commission, North-West Delhi",
+  "District Consumer Disputes Redressal Commission, Nuh (Haryana)",
+  "District Consumer Disputes Redressal Commission, Palwal (Haryana)",
+  "District Consumer Disputes Redressal Commission, Panchkula (Haryana)",
+  "District Consumer Disputes Redressal Commission, Panipat (Haryana)",
+  "District Consumer Disputes Redressal Commission, Pathankot (Punjab)",
+  "District Consumer Disputes Redressal Commission, Patiala (Punjab)",
+  "District Consumer Disputes Redressal Commission, Rewari (Haryana)",
+  "District Consumer Disputes Redressal Commission, Rohtak (Haryana)",
+  "District Consumer Disputes Redressal Commission, Rupnagar (Punjab)",
+  "District Consumer Disputes Redressal Commission, Sahibzada Ajit Singh Nagar (Mohali) (Punjab)",
+  "District Consumer Disputes Redressal Commission, Sangrur (Punjab)",
+  "District Consumer Disputes Redressal Commission, Shahdara",
+  "District Consumer Disputes Redressal Commission, Shahid Bhagat Singh Nagar (Nawanshahr) (Punjab)",
+  "District Consumer Disputes Redressal Commission, Sirsa (Haryana)",
+  "District Consumer Disputes Redressal Commission, Sonipat (Haryana)",
+  "District Consumer Disputes Redressal Commission, South Delhi",
+  "District Consumer Disputes Redressal Commission, South-East Delhi",
+  "District Consumer Disputes Redressal Commission, South-West Delhi",
+  "District Consumer Disputes Redressal Commission, Sri Muktsar Sahib (Punjab)",
+  "District Consumer Disputes Redressal Commission, Tarn Taran (Punjab)",
+  "District Consumer Disputes Redressal Commission, West Delhi",
+  "District Consumer Disputes Redressal Commission, Yamunanagar (Haryana)",
+  "District Court, Mohali",
+  "High Court at Calcutta, Kolkata",
+  "High Court of Andhra Pradesh, Amaravati",
+  "High Court of Assam, Guwahati",
+  "High Court of Chhattisgarh, Bilaspur",
+  "High Court of Delhi, New Delhi",
+  "High Court of Gujarat, Ahmedabad",
+  "High Court of Himachal Pradesh, Shimla",
+  "High Court of Jammu and Kashmir and Ladakh, Srinagar",
+  "High Court of Jharkhand, Ranchi",
+  "High Court of Judicature at Allahabad, Allahabad",
+  "High Court of Judicature at Bombay, Mumbai",
+  "High Court of Judicature at Madras, Chennai",
+  "High Court of Judicature at Patna, Patna",
+  "High Court of Karnataka, Bengaluru",
+  "High Court of Kerala, Ernakulam",
+  "High Court of Madhya Pradesh, Jabalpur",
+  "High Court of Manipur, Imphal",
+  "High Court of Meghalaya, Shillong",
+  "High Court of Odisha, Cuttack",
+  "High Court of Punjab and Haryana",
+  "High Court of Punjab and Haryana, Chandigarh",
+  "High Court of Rajasthan, Jodhpur",
+  "High Court of Sikkim, Gangtok",
+  "High Court of Telangana, Hyderabad",
+  "High Court of Tripura, Agartala",
+  "High Court of Uttarakhand, Nainital",
+  "Income Tax Appellate Tribunal (ITAT), Ahmedabad",
+  "Income Tax Appellate Tribunal (ITAT), Amritsar",
+  "Income Tax Appellate Tribunal (ITAT), Bengaluru",
+  "Income Tax Appellate Tribunal (ITAT), Chandigarh",
+  "Income Tax Appellate Tribunal (ITAT), Chennai",
+  "Income Tax Appellate Tribunal (ITAT), Hyderabad",
+  "Income Tax Appellate Tribunal (ITAT), Jaipur",
+  "Income Tax Appellate Tribunal (ITAT), Kolkata",
+  "Income Tax Appellate Tribunal (ITAT), Lucknow",
+  "Income Tax Appellate Tribunal (ITAT), Mumbai",
+  "Income Tax Appellate Tribunal (ITAT), New Delhi",
+  "Income Tax Appellate Tribunal (ITAT), Pune",
+  "Judicial Complex, Dera Bassi",
+  "NCDRC, New Delhi",
+  "National Anti-Profiteering Authority, New Delhi",
+  "National Company Law Appellate Tribunal (NCLAT), Chennai",
+  "National Company Law Appellate Tribunal (NCLAT), New Delhi",
+  "National Company Law Tribunal (NCLT), Ahmedabad",
+  "National Company Law Tribunal (NCLT), Allahabad",
+  "National Company Law Tribunal (NCLT), Amravati",
+  "National Company Law Tribunal (NCLT), Bengaluru",
+  "National Company Law Tribunal (NCLT), Chandigarh",
+  "National Company Law Tribunal (NCLT), Chennai",
+  "National Company Law Tribunal (NCLT), Cuttack",
+  "National Company Law Tribunal (NCLT), Guwahati",
+  "National Company Law Tribunal (NCLT), Hyderabad",
+  "National Company Law Tribunal (NCLT), Indore",
+  "National Company Law Tribunal (NCLT), Jaipur",
+  "National Company Law Tribunal (NCLT), Kochi",
+  "National Company Law Tribunal (NCLT), Kolkata",
+  "National Company Law Tribunal (NCLT), Mumbai",
+  "National Company Law Tribunal (NCLT), Principal Bench, New Delhi",
+  "National Company Law Tribunal (NCLT), Vijayawada",
+  "National Consumer Disputes Redressal Commission (NCDRC), New Delhi",
+  "National Green Tribunal (NGT), Central Zone, Bhopal",
+  "National Green Tribunal (NGT), Eastern Zone, Kolkata",
+  "National Green Tribunal (NGT), Principal Bench, New Delhi",
+  "National Green Tribunal (NGT), Southern Zone, Chennai",
+  "National Green Tribunal (NGT), Western Zone, Pune",
+  "Punjab & Haryana High Court",
+  "RERA Punjab",
+  "Real Estate Appellate Tribunal, Haryana",
+  "Real Estate Appellate Tribunal, Punjab",
+  "Real Estate Regulatory Authority (RERA), Andaman and Nicobar Islands",
+  "Real Estate Regulatory Authority (RERA), Andhra Pradesh",
+  "Real Estate Regulatory Authority (RERA), Arunachal Pradesh",
+  "Real Estate Regulatory Authority (RERA), Assam",
+  "Real Estate Regulatory Authority (RERA), Bihar",
+  "Real Estate Regulatory Authority (RERA), Chandigarh",
+  "Real Estate Regulatory Authority (RERA), Chhattisgarh",
+  "Real Estate Regulatory Authority (RERA), Delhi",
+  "Real Estate Regulatory Authority (RERA), Goa",
+  "Real Estate Regulatory Authority (RERA), Gujarat",
+  "Real Estate Regulatory Authority (RERA), Haryana",
+  "Real Estate Regulatory Authority (RERA), Himachal Pradesh",
+  "Real Estate Regulatory Authority (RERA), Jammu and Kashmir",
+  "Real Estate Regulatory Authority (RERA), Jharkhand",
+  "Real Estate Regulatory Authority (RERA), Karnataka",
+  "Real Estate Regulatory Authority (RERA), Kerala",
+  "Real Estate Regulatory Authority (RERA), Madhya Pradesh",
+  "Real Estate Regulatory Authority (RERA), Maharashtra",
+  "Real Estate Regulatory Authority (RERA), Manipur",
+  "Real Estate Regulatory Authority (RERA), Meghalaya",
+  "Real Estate Regulatory Authority (RERA), Mizoram",
+  "Real Estate Regulatory Authority (RERA), Nagaland",
+  "Real Estate Regulatory Authority (RERA), Odisha",
+  "Real Estate Regulatory Authority (RERA), Puducherry",
+  "Real Estate Regulatory Authority (RERA), Punjab",
+  "Real Estate Regulatory Authority (RERA), Rajasthan",
+  "Real Estate Regulatory Authority (RERA), Sikkim",
+  "Real Estate Regulatory Authority (RERA), Tamil Nadu",
+  "Real Estate Regulatory Authority (RERA), Telangana",
+  "Real Estate Regulatory Authority (RERA), Tripura",
+  "Real Estate Regulatory Authority (RERA), Uttar Pradesh",
+  "Real Estate Regulatory Authority (RERA), Uttarakhand",
+  "Real Estate Regulatory Authority (RERA), West Bengal",
+  "Securities Appellate Tribunal (SAT), Mumbai",
+  "State Consumer Disputes Redressal Commission, Andaman and Nicobar Islands",
+  "State Consumer Disputes Redressal Commission, Andhra Pradesh",
+  "State Consumer Disputes Redressal Commission, Arunachal Pradesh",
+  "State Consumer Disputes Redressal Commission, Assam",
+  "State Consumer Disputes Redressal Commission, Bihar",
+  "State Consumer Disputes Redressal Commission, Chandigarh",
+  "State Consumer Disputes Redressal Commission, Chhattisgarh",
+  "State Consumer Disputes Redressal Commission, Dadra and Nagar Haveli and Daman and Diu",
+  "State Consumer Disputes Redressal Commission, Delhi",
+  "State Consumer Disputes Redressal Commission, Goa",
+  "State Consumer Disputes Redressal Commission, Gujarat",
+  "State Consumer Disputes Redressal Commission, Haryana",
+  "State Consumer Disputes Redressal Commission, Himachal Pradesh",
+  "State Consumer Disputes Redressal Commission, Jammu and Kashmir",
+  "State Consumer Disputes Redressal Commission, Jharkhand",
+  "State Consumer Disputes Redressal Commission, Karnataka",
+  "State Consumer Disputes Redressal Commission, Kerala",
+  "State Consumer Disputes Redressal Commission, Ladakh",
+  "State Consumer Disputes Redressal Commission, Lakshadweep",
+  "State Consumer Disputes Redressal Commission, Madhya Pradesh",
+  "State Consumer Disputes Redressal Commission, Maharashtra",
+  "State Consumer Disputes Redressal Commission, Manipur",
+  "State Consumer Disputes Redressal Commission, Meghalaya",
+  "State Consumer Disputes Redressal Commission, Mizoram",
+  "State Consumer Disputes Redressal Commission, Nagaland",
+  "State Consumer Disputes Redressal Commission, Odisha",
+  "State Consumer Disputes Redressal Commission, Puducherry",
+  "State Consumer Disputes Redressal Commission, Punjab",
+  "State Consumer Disputes Redressal Commission, Rajasthan",
+  "State Consumer Disputes Redressal Commission, Sikkim",
+  "State Consumer Disputes Redressal Commission, Tamil Nadu",
+  "State Consumer Disputes Redressal Commission, Telangana",
+  "State Consumer Disputes Redressal Commission, Tripura",
+  "State Consumer Disputes Redressal Commission, Uttar Pradesh",
+  "State Consumer Disputes Redressal Commission, Uttarakhand",
+  "State Consumer Disputes Redressal Commission, West Bengal",
+  "Supreme Court of India",
+  "Supreme Court of India, New Delhi",
+  "Telecom Disputes Settlement and Appellate Tribunal (TDSAT), New Delhi"
+];
+function courtOptionsHTML() {
+  const seen = {};
+  const all = COURT_LIST.slice();
+  // anything already used in a case, or added in Settings, must appear too
+  db.cases.forEach(c => { if (c.court) all.push(c.court); });
+  (db.settings.courts || []).forEach(c => all.push(c));
+  return all.filter(x => {
+    if (!x) return false;
+    const k = x.toLowerCase();
+    if (seen[k]) return false;
+    seen[k] = 1; return true;
+  }).sort().map(x => '<option value="' + esc(x) + '"></option>').join("");
+}
+function courtsInUse() {
+  const set = {};
+  (db.settings.courts || []).forEach(c => set[c] = 1);
+  db.cases.forEach(c => { if (c.court) set[c.court] = 1; });
+  return Object.keys(set).sort();
+}
+
 let db = null;
 let courtSync = null;      // data.json written by court_sync.py
 let courtSyncNote = "";   // status line for Settings
@@ -502,6 +861,7 @@ function blankDB() {
       courts: DEFAULT_COURTS.slice()
     },
     cases: [],
+    tasks: [],
     createdAt: new Date().toISOString()
   };
 }
@@ -515,6 +875,8 @@ function load() {
     db.settings = Object.assign(blankDB().settings, parsed.settings || {});
     if (!Array.isArray(db.settings.courts) || !db.settings.courts.length) db.settings.courts = DEFAULT_COURTS.slice();
     if (!Array.isArray(db.cases)) db.cases = [];
+    if (!Array.isArray(db.tasks)) db.tasks = [];
+    db.tasks.forEach(t => { t.id = t.id || uid(); t.text = t.text || ""; t.due = t.due || ""; t.priority = t.priority || "normal"; t.done = !!t.done; });
     db.cases.forEach(normaliseCase);
   } catch (e) {
     db = blankDB();
@@ -726,9 +1088,11 @@ function humanSize(n) {
 const DOC_KINDS = ["Vakalatnama", "Petition / Plaint", "Written statement", "Reply", "Evidence", "Affidavit", "Order", "Judgment", "Application", "Other"];
 
 /* ================= tasks ================= */
+const GENERAL_CASE = { id: "", client: "Chamber (general)", opposite: "", caseNo: "", court: "", _general: true };
 function tasksAll() {
   const out = [];
   db.cases.forEach(c => (c.tasks || []).forEach(t => out.push({ c, t })));
+  (db.tasks || []).forEach(t => out.push({ c: GENERAL_CASE, t, general: true }));
   return out;
 }
 const PRIORITY_RANK = { high: 0, normal: 1, low: 2 };
@@ -744,12 +1108,14 @@ function tasksLate() { return openTasks().filter(x => x.t.due && x.t.due < today
 
 /* ================= fees ================= */
 function feeTotals(c) {
-  let fees = 0, paid = 0;
+  let fees = 0, paid = 0, waived = 0;
   (c.fees || []).forEach(f => {
     const amt = Number(f.amount) || 0;
-    if (f.kind === "payment") paid += amt; else fees += amt;
+    if (f.kind === "payment") paid += amt;
+    else if (f.kind === "waiver") waived += amt;
+    else fees += amt;
   });
-  return { fees, paid, balance: fees - paid };
+  return { fees, paid, waived, balance: fees - waived - paid };
 }
 function money(n) {
   n = Number(n) || 0;
@@ -811,7 +1177,7 @@ function viewToday() {
   h += '<div class="stats">';
   h += stat(list.length, "Listed today", "stat--hero");
   h += stat(weekCount, "Next 7 days", "");
-  h += stat(activeCases().length, "Active cases", "");
+  h += stat(activeCases().length, "Active cases", "", "show-active-cases");
   h += stat(late.length, "Date passed / to verify", late.length ? "stat--alert" : "");
   h += '</div>';
 
@@ -900,8 +1266,30 @@ function viewToday() {
   h += "</div>";
   return h;
 }
-function stat(n, label, cls) {
-  return '<div class="stat ' + (cls || "") + '"><div class="stat__n">' + n + '</div><div class="stat__l">' + esc(label) + "</div></div>";
+function stat(n, label, cls, action) {
+  const attrs = action
+    ? ' data-action="' + action + '" role="button" tabindex="0" title="Tap to open the list" style="cursor:pointer"'
+    : "";
+  return '<div class="stat ' + (cls || "") + '"' + attrs + '><div class="stat__n">' + n +
+    '</div><div class="stat__l">' + esc(label) + (action ? " ›" : "") + "</div></div>";
+}
+
+function showActiveCases() {
+  const list = activeCases().sort(sortByDateThenCourt);
+  let body = '<div class="hint" style="margin-bottom:10px">' + list.length + ' active case' + (list.length === 1 ? "" : "s") + ' — tap a row to open it</div>';
+  if (!list.length) {
+    body += '<div class="empty" style="padding:18px"><b>No active cases.</b>Add one with + New case.</div>';
+  } else {
+    body += '<div class="tbl-wrap" style="max-height:58vh;overflow:auto"><table class="tbl"><thead><tr><th>Matter</th><th>Court</th><th>Next date</th></tr></thead><tbody>';
+    list.forEach(c => {
+      body += '<tr style="cursor:pointer" data-action="open-case" data-id="' + esc(c.id) + '">';
+      body += '<td><span class="case-title">' + esc(caseTitle(c)) + "</span>" + (c.caseNo ? '<div class="case-meta mono">' + esc(c.caseNo) + "</div>" : "") + "</td>";
+      body += "<td>" + esc(c.court || "—") + "</td>";
+      body += '<td class="num nowrap">' + (c.nextDate ? fmtDate(c.nextDate) : "—") + "</td></tr>";
+    });
+    body += "</tbody></table></div>";
+  }
+  openModal({ title: "Active cases", body: body, submit: "Close", hideCancel: true, onSubmit: () => closeModal() });
 }
 
 /* ---------------- cause list table ---------------- */
@@ -956,7 +1344,7 @@ function viewCause() {
   h += '<div class="toolbar">';
   h += '<div class="field"><label>Date</label><input type="date" id="causeDate" value="' + esc(iso) + '" data-change="cause-date"></div>';
   h += '<div class="field"><label>Court</label><select id="causeCourt" data-change="cause-court"><option value="">All courts</option>';
-  db.settings.courts.forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.causeCourt === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
+  courtsInUse().forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.causeCourt === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
   h += "</select></div>";
   const tags = allTags();
   if (tags.length) {
@@ -997,7 +1385,7 @@ function viewCases() {
   h += '<div class="toolbar">';
   h += '<div class="field field--grow"><label>Search</label><input type="search" id="caseSearch" placeholder="Party, case number, CNR, tag…" value="' + esc(ui.q) + '" data-input="search"></div>';
   h += '<div class="field"><label>Court</label><select data-change="court-filter"><option value="">All courts</option>';
-  db.settings.courts.forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.courtFilter === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
+  courtsInUse().forEach(c => { h += '<option value="' + esc(c) + '"' + (ui.courtFilter === c ? " selected" : "") + ">" + esc(c) + "</option>"; });
   h += "</select></div>";
   h += '<div class="field"><label>Show</label><select data-change="status-filter">';
   h += '<option value="active"' + (ui.statusFilter === "active" ? " selected" : "") + ">Active only</option>";
@@ -1189,8 +1577,8 @@ function viewCaseDetail() {
       h += '<div class="card__body card__body--flush"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Particulars</th><th class="num">Amount</th><th></th></tr></thead><tbody>';
       fs.forEach(f => {
         h += '<tr><td class="num nowrap">' + fmtDate(f.date) + '</td>';
-        h += '<td>' + esc(f.particulars || '') + (f.kind === 'payment' ? ' <span class="badge badge--sage">Received</span>' : ' <span class="badge badge--navy">Billed</span>') + '</td>';
-        h += '<td class="num"' + (f.kind === 'payment' ? ' style="color:var(--sage)"' : '') + '>' + (f.kind === 'payment' ? '−' : '') + money(f.amount) + '</td>';
+        h += '<td>' + esc(f.particulars || '') + (f.kind === 'payment' ? ' <span class="badge badge--sage">Received</span>' : f.kind === 'waiver' ? ' <span class="badge badge--gold">Waived</span>' : ' <span class="badge badge--navy">Billed</span>') + '</td>';
+        h += '<td class="num"' + (f.kind === 'payment' ? ' style="color:var(--sage)"' : f.kind === 'waiver' ? ' style="color:var(--gold)"' : '') + '>' + (f.kind === 'payment' || f.kind === 'waiver' ? '−' : '') + money(f.amount) + '</td>';
         h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="del-fee" data-id="' + esc(c.id) + '" data-fid="' + esc(f.id) + '">×</button></td></tr>';
       });
       h += '</tbody></table></div></div>';
@@ -1266,6 +1654,12 @@ function orderRowHTML(c, o, compact) {
   h += "</div>";
   h += '<div class="hint" style="margin-top:2px">' + esc(caseTitle(c)) + " · " + esc(c.caseNo || "") + "</div>";
   if (o.summary) h += '<div class="order-text' + (compact ? " order-text--clamped" : "") + '">' + esc(o.summary) + "</div>";
+  if (o.file) {
+    h += '<div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
+    h += '<button class="btn btn--sm" data-action="open-doc" data-doc="' + esc(o.file.id) + '">Open order PDF</button>';
+    h += '<button class="btn btn--sm btn--ghost" data-action="download-doc" data-doc="' + esc(o.file.id) + '" data-name="' + esc(o.file.name) + '">Save</button>';
+    h += '<span class="hint">' + esc(o.file.name) + '</span></div>';
+  }
   if (o.link) h += '<div style="margin-top:6px"><a href="' + esc(o.link) + '" target="_blank" rel="noopener" class="hint">Open order link ↗</a></div>';
   h += "</div>";
   h += '<div class="order-actions">';
@@ -1287,7 +1681,8 @@ function viewOrders() {
   h += '<div class="page-head"><div><div class="eyebrow">Order sheet</div>';
   h += '<h1 class="page-title">' + unread.length + " order" + (unread.length === 1 ? "" : "s") + " to read</h1>";
   h += '<div class="page-sub">' + all.length + " orders recorded across your cases</div></div>";
-  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="toggle-order-view">' + (ui.showAllOrders ? "Show unread only" : "Show all orders") + "</button></div></div>";
+  h += '<div class="head-actions"><button class="btn btn--ghost" data-action="toggle-order-view">' + (ui.showAllOrders ? "Show unread only" : "Show all orders") + "</button>";
+  h += '<button class="btn btn--primary" data-action="add-order" data-id="">+ Add order</button></div></div>';
   h += '<div class="card"><div class="card__body card__body--flush">';
   if (!list.length) h += '<div class="empty"><b>' + (ui.showAllOrders ? "No orders recorded yet." : "Nothing pending.") + "</b>Add orders from a case page — paste the operative part and keep the PDF link.</div>";
   else list.forEach(x => { h += orderRowHTML(x.c, x.o, true); });
@@ -1362,14 +1757,16 @@ function viewTasks() {
   let h = '';
   h += '<div class="page-head"><div><div class="eyebrow">To do</div>';
   h += '<h1 class="page-title">' + open.length + ' task' + (open.length === 1 ? '' : 's') + ' open</h1>';
-  h += '<div class="page-sub">' + (late.length ? late.length + ' overdue · ' : '') + tasksDueOn(todayISO()).length + ' due today · ' + all.filter(x => x.t.done).length + ' done</div></div></div>';
+  h += '<div class="page-sub">' + (late.length ? late.length + ' overdue · ' : '') + tasksDueOn(todayISO()).length + ' due today · ' + all.filter(x => x.t.done).length + ' done</div></div>';
+  h += '<div class="head-actions"><button class="btn btn--primary" data-action="add-task" data-id="">+ Add task</button>';
+  h += '<button class="btn btn--ghost" data-action="new-case">+ New case</button></div></div>';
   h += '<div class="toolbar"><div class="field"><label>Show</label><select data-change="task-filter">';
   h += '<option value="open"' + (ui.taskFilter === 'open' ? ' selected' : '') + '>Open</option>';
   h += '<option value="done"' + (ui.taskFilter === 'done' ? ' selected' : '') + '>Done</option>';
   h += '<option value="all"' + (ui.taskFilter === 'all' ? ' selected' : '') + '>Everything</option>';
   h += '</select></div></div>';
   h += '<div class="card"><div class="card__body card__body--flush">';
-  if (!list.length) h += '<div class="empty"><b>No tasks here.</b>Open a case and add what has to be done — drafting, filing, service, calling the client.</div>';
+  if (!list.length) h += '<div class="empty"><b>No tasks here yet.</b>Tap <b>+ Add task</b> above — drafting, filing, service, calling the client. You can attach it to a case or leave it as general chamber work.</div>';
   else {
     h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34px"></th><th>Task</th><th>Case</th><th>Due</th><th>Priority</th><th></th></tr></thead><tbody>';
     list.forEach(x => {
@@ -1378,7 +1775,8 @@ function viewTasks() {
       h += '<tr>';
       h += '<td><input type="checkbox" data-action="toggle-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '"' + (x.t.done ? ' checked' : '') + ' style="width:16px;height:16px;cursor:pointer"></td>';
       h += '<td' + (x.t.done ? ' style="text-decoration:line-through;color:var(--ink-3)"' : '') + '>' + esc(x.t.text) + '</td>';
-      h += '<td><a href="#/case/' + esc(x.c.id) + '" data-action="open-case" data-id="' + esc(x.c.id) + '">' + esc(caseTitle(x.c)) + '</a></td>';
+      if (x.general) h += '<td class="hint">Chamber (general)</td>';
+      else h += '<td style="max-width:240px"><a href="#/case/' + esc(x.c.id) + '" data-action="open-case" data-id="' + esc(x.c.id) + '" title="' + esc(caseTitle(x.c)) + '" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(caseTitle(x.c)) + '</a></td>';
       h += '<td class="num nowrap"' + (isLate ? ' style="color:var(--danger);font-weight:600"' : isToday ? ' style="color:var(--terra);font-weight:600"' : '') + '>' + (x.t.due ? fmtDate(x.t.due) : '—') + '</td>';
       h += '<td>' + (x.t.priority === 'high' ? '<span class="badge badge--danger">High</span>' : x.t.priority === 'low' ? '<span class="badge">Low</span>' : '<span class="badge badge--navy">Normal</span>') + '</td>';
       h += '<td class="nowrap"><button class="btn btn--sm btn--ghost" data-action="edit-task" data-id="' + esc(x.c.id) + '" data-tid="' + esc(x.t.id) + '">Edit</button> ';
@@ -1468,14 +1866,16 @@ function viewMoney() {
   let h = '';
   h += '<div class="page-head"><div><div class="eyebrow">Fees</div>';
   h += '<h1 class="page-title">' + money(tot.balance) + ' outstanding</h1>';
-  h += '<div class="page-sub">Billed ' + money(tot.fees) + ' · received ' + money(tot.paid) + '</div></div></div>';
+  h += '<div class="page-sub">Billed ' + money(tot.fees) + ' · received ' + money(tot.paid) + '</div></div>';
+  h += '<div class="head-actions"><button class="btn btn--primary" data-action="add-fee" data-id="">+ Add fee / receipt</button>';
+  h += '<button class="btn btn--ghost" data-action="new-case">+ New case</button></div></div>';
   h += '<div class="stats" style="grid-template-columns:repeat(3,1fr)">';
   h += '<div class="stat stat--hero"><div class="stat__n">' + money(tot.balance) + '</div><div class="stat__l">Outstanding</div></div>';
   h += '<div class="stat"><div class="stat__n">' + money(tot.fees) + '</div><div class="stat__l">Billed</div></div>';
   h += '<div class="stat"><div class="stat__n">' + money(tot.paid) + '</div><div class="stat__l">Received</div></div>';
   h += '</div>';
   h += '<div class="card"><div class="card__body card__body--flush">';
-  if (!list.length) h += '<div class="empty"><b>No fee entries yet.</b>Open a case, go to the Fees tab and add what was agreed and what has come in.</div>';
+  if (!list.length) h += '<div class="empty"><b>No fee entries yet.</b>Tap <b>+ Add fee / receipt</b> above: record the fee agreed, then each payment as it comes in. The balance keeps itself.</div>';
   else {
     h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Client / matter</th><th class="num">Billed</th><th class="num">Received</th><th class="num">Balance</th><th></th></tr></thead><tbody>';
     list.forEach(c => {
@@ -1617,9 +2017,12 @@ function caseForm(c) {
   if (c.court && courts.indexOf(c.court) === -1) courts.push(c.court);
   const sides = ["", "Petitioner", "Respondent", "Appellant", "Applicant", "Complainant", "Opposite Party", "Accused", "Plaintiff", "Defendant"];
   let h = '<div class="grid-2">';
-  h += field("Client / our party *", '<input name="client" required value="' + esc(c.client) + '" placeholder="Name of your client">');
-  h += field("Opposite party", '<input name="opposite" value="' + esc(c.opposite) + '" placeholder="Other side">');
-  h += field("Court / tribunal", '<select name="court">' + courts.map(x => '<option value="' + esc(x) + '"' + (c.court === x ? " selected" : "") + ">" + esc(x) + "</option>").join("") + "</select>");
+  h += field("Petitioner / Appellant / Applicant *", '<input name="client" required value="' + esc(c.client) + '" placeholder="Name">');
+  h += field("Respondent / Opposite party", '<input name="opposite" value="' + esc(c.opposite) + '" placeholder="Name">');
+  h += field("Court / tribunal / commission",
+    '<input name="court" list="courtList" autocomplete="off" value="' + esc(c.court) + '" ' +
+    'placeholder="Type a few letters — High Court, District Court, DRT, NCLT, RERA, Commission…">' +
+    '<datalist id="courtList">' + courtOptionsHTML() + '</datalist>');
   h += field("Room / bench", '<input name="room" value="' + esc(c.room) + '" placeholder="e.g. Court Room 3, DB">');
   h += field("Case number", '<input name="caseNo" value="' + esc(c.caseNo) + '" placeholder="e.g. CRR-1234-2024">');
   h += field("CNR number", '<input name="cnr" value="' + esc(c.cnr) + '" placeholder="e.g. PHHC010012342024">');
@@ -1736,35 +2139,64 @@ function recordHearing(id, presetDate, hearingId) {
 }
 
 /* ---------------- order form ---------------- */
-function orderForm(id, orderId) {
-  const c = getCase(id);
-  if (!c) return;
-  const existing = orderId ? (c.orders || []).find(x => x.id === orderId) : null;
+function orderForm(caseId, orderId) {
+  const fromGlobal = !caseId;
+  const c = caseId ? getCase(caseId) : null;
+  if (caseId && !c) return;
+  const existing = (orderId && c) ? (c.orders || []).find(x => x.id === orderId) : null;
   const o = existing || { id: uid(), date: todayISO(), bench: "", summary: "", link: "", read: false };
   let h = "";
+  if (fromGlobal) {
+    if (!activeCases().length) { toast("Add a case first — an order belongs to a matter"); newCase(); return; }
+    h += field("Which case?", '<select name="caseSel">' +
+      activeCases().map(x => '<option value="' + esc(x.id) + '">' + esc(caseTitle(x)) + (x.caseNo ? " · " + esc(x.caseNo) : "") + '</option>').join("") +
+      "</select>");
+  }
   h += '<div class="grid-2">';
   h += field("Order date", '<input type="date" name="date" required value="' + esc(o.date) + '">');
   h += field("Bench / judge", '<input name="bench" value="' + esc(o.bench) + '" placeholder="e.g. Hon\'ble Mr. Justice …">');
   h += "</div>";
   h += field("What the order says", '<textarea name="summary" style="min-height:130px" placeholder="Paste the operative part, or note it in your own words.">' + esc(o.summary) + "</textarea>");
-  h += field("Link to order PDF (optional)", '<input name="link" value="' + esc(o.link) + '" placeholder="https://…">');
+  h += field("Upload the order (PDF, or a photo of it)", '<input type="file" id="orderFile" accept="application/pdf,image/*">');
+  if (o.file) {
+    h += '<div class="hint" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">Attached: <b>' + esc(o.file.name) + '</b>' +
+      '<button type="button" class="btn btn--sm btn--ghost" data-action="open-doc" data-doc="' + esc(o.file.id) + '">Open</button></div>';
+  }
+  h += field("…or a link to the order PDF", '<input name="link" value="' + esc(o.link) + '" placeholder="https://…">');
   h += '<div class="field"><label>Status</label><select name="read"><option value="no"' + (!o.read ? " selected" : "") + ">Unread — to be read</option><option value=\"yes\"" + (o.read ? " selected" : "") + ">Already read</option></select></div>";
   openModal({
-    title: existing ? "Edit order" : "Add order — " + caseTitle(c),
+    title: existing ? "Edit order" : "Add order",
     body: h,
     submit: "Save order",
-    onSubmit: fd => {
+    onSubmit: async fd => {
+      const target = fromGlobal ? getCase(formVal(fd, "caseSel")) : c;
+      if (!target) { closeModal(); return; }
       const rec = existing || { id: uid(), createdAt: new Date().toISOString() };
       rec.date = formVal(fd, "date") || todayISO();
       rec.bench = formVal(fd, "bench");
       rec.summary = formVal(fd, "summary");
       rec.link = formVal(fd, "link");
       rec.read = formVal(fd, "read") === "yes";
-      if (!existing) { c.orders = c.orders || []; c.orders.push(rec); }
-      c.updatedAt = new Date().toISOString();
-      upsertCase(c);
+      const inp = document.getElementById("orderFile");
+      const f = inp && inp.files && inp.files[0];
+      if (f) {
+        if (f.size > 25 * 1024 * 1024) toast("That file is over 25 MB");
+        else {
+          const m2 = { id: uid(), name: f.name, type: f.type || "application/octet-stream", size: f.size, kind: "Order", addedAt: new Date().toISOString() };
+          try {
+            await idbPut({ id: m2.id, caseId: target.id, blob: f, name: f.name, type: m2.type });
+            target.docs = target.docs || [];
+            target.docs.push(m2);
+            rec.file = { id: m2.id, name: m2.name, type: m2.type, size: m2.size };
+          } catch (e) { toast("Could not store the file — open the app from its https address"); }
+        }
+      }
+      if (!existing) { target.orders = target.orders || []; target.orders.push(rec); }
+      target.updatedAt = new Date().toISOString();
+      upsertCase(target);
       closeModal();
       toast(existing ? "Order updated" : "Order added");
+      if (ui.route === "case") ui.tab = "orders";
       render();
     }
   });
@@ -1772,18 +2204,26 @@ function orderForm(id, orderId) {
 
 /* ================= task / fee forms, documents, notifications ================= */
 function taskForm(caseId, taskId) {
-  const c = getCase(caseId);
-  if (!c) return;
-  const existing = taskId ? (c.tasks || []).find(t => t.id === taskId) : null;
+  const fromGlobal = !caseId;
+  const c = caseId ? getCase(caseId) : null;
+  if (caseId && !c) return;
+  const existing = taskId
+    ? (c ? (c.tasks || []) : (db.tasks || [])).find(t => t.id === taskId)
+    : null;
   const t = existing || { id: uid(), text: "", due: "", priority: "normal", done: false };
   let h = "";
+  if (fromGlobal && !existing) {
+    h += field("Which case?", '<select name="caseSel"><option value="">— Chamber (general work) —</option>' +
+      activeCases().map(x => '<option value="' + esc(x.id) + '">' + esc(caseTitle(x)) + (x.caseNo ? " · " + esc(x.caseNo) : "") + '</option>').join("") +
+      "</select>");
+  }
   h += field("What has to be done", '<textarea name="text" required placeholder="e.g. Draft reply to the application, get client signature, file before 4 pm">' + esc(t.text) + "</textarea>");
   h += '<div class="grid-2">';
   h += field("Due date", '<input type="date" name="due" value="' + esc(t.due) + '">');
   h += field("Priority", '<select name="priority">' +
     ['high', 'normal', 'low'].map(x => '<option value="' + x + '"' + (t.priority === x ? ' selected' : '') + '>' + x.charAt(0).toUpperCase() + x.slice(1) + '</option>').join('') + '</select>');
   h += "</div>";
-  h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
+  if (!fromGlobal) h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
   openModal({
     title: existing ? "Edit task" : "Add task",
     body: h,
@@ -1794,8 +2234,15 @@ function taskForm(caseId, taskId) {
       rec.due = formVal(fd, "due");
       rec.priority = formVal(fd, "priority") || "normal";
       if (!rec.text) { closeModal(); return; }
-      if (!existing) { c.tasks = c.tasks || []; c.tasks.push(rec); }
-      upsertCase(c); closeModal();
+      if (existing) {
+        if (c) upsertCase(c); else save();
+      } else {
+        const targetId = fromGlobal ? formVal(fd, "caseSel") : caseId;
+        const target = targetId ? getCase(targetId) : null;
+        if (target) { target.tasks = target.tasks || []; target.tasks.push(rec); upsertCase(target); }
+        else { db.tasks = db.tasks || []; db.tasks.push(rec); save(); }
+      }
+      closeModal();
       toast(existing ? "Task updated" : "Task added");
       if (ui.route === "case") ui.tab = "tasks";
       render();
@@ -1804,16 +2251,23 @@ function taskForm(caseId, taskId) {
 }
 
 function feeForm(caseId) {
-  const c = getCase(caseId);
-  if (!c) return;
+  const fromGlobal = !caseId;
+  const c = caseId ? getCase(caseId) : null;
+  if (caseId && !c) return;
   let h = "";
+  if (fromGlobal) {
+    if (!activeCases().length) { toast("Add a case first — a fee belongs to a matter"); newCase(); return; }
+    h += field("Which case?", '<select name="caseSel">' +
+      activeCases().map(x => '<option value="' + esc(x.id) + '">' + esc(caseTitle(x)) + (x.caseNo ? " · " + esc(x.caseNo) : "") + '</option>').join("") +
+      "</select>");
+  }
   h += '<div class="grid-2">';
   h += field("Date", '<input type="date" name="date" required value="' + todayISO() + '">');
-  h += field("Type", '<select name="kind"><option value="fee">Fee billed</option><option value="payment">Payment received</option></select>');
+  h += field("Type", '<select name="kind"><option value="fee">Fee billed (add)</option><option value="payment">Payment received (deduct from balance)</option><option value="waiver">Waiver / discount (deduct)</option></select>');
   h += "</div>";
   h += field("Particulars", '<input name="particulars" placeholder="e.g. Fee for arguments, or Cash received against fee">');
   h += field("Amount (₹)", '<input name="amount" type="number" min="0" step="1" required placeholder="50000">');
-  h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
+  if (!fromGlobal) h += '<div class="hint">' + esc(caseTitle(c)) + "</div>";
   openModal({
     title: "Add fee entry",
     body: h,
@@ -1821,9 +2275,12 @@ function feeForm(caseId) {
     onSubmit: fd => {
       const amt = Number(formVal(fd, "amount")) || 0;
       if (!amt) { closeModal(); return; }
-      c.fees = c.fees || [];
-      c.fees.push({ id: uid(), date: formVal(fd, "date") || todayISO(), particulars: formVal(fd, "particulars"), amount: amt, kind: formVal(fd, "kind") === "payment" ? "payment" : "fee" });
-      upsertCase(c); closeModal(); toast("Entry added");
+      const target = fromGlobal ? getCase(formVal(fd, "caseSel")) : c;
+      if (!target) { closeModal(); return; }
+      const k = formVal(fd, "kind");
+      target.fees = target.fees || [];
+      target.fees.push({ id: uid(), date: formVal(fd, "date") || todayISO(), particulars: formVal(fd, "particulars"), amount: amt, kind: (k === "payment" || k === "waiver") ? k : "fee" });
+      upsertCase(target); closeModal(); toast("Entry added");
       if (ui.route === "case") ui.tab = "fees";
       render();
     }
@@ -2253,7 +2710,8 @@ function handleAction(el, ev) {
   switch (a) {
     case "new-case": newCase(); break;
     case "edit-case": editCase(id); break;
-    case "open-case": ev.preventDefault(); go("case", { caseId: id, tab: "diary" }); break;
+    case "open-case": ev.preventDefault(); closeModal(); go("case", { caseId: id, tab: "diary" }); break;
+    case "show-active-cases": showActiveCases(); break;
     case "goto-cases": ev.preventDefault(); go("cases"); break;
     case "goto-orders": go("orders"); break;
     case "goto-cause": go("cause", { causeDate: date || todayISO() }); break;
@@ -2288,16 +2746,30 @@ function handleAction(el, ev) {
     case "add-task": taskForm(id); break;
     case "edit-task": taskForm(id, el.getAttribute("data-tid")); break;
     case "toggle-task": {
-      const c = getCase(id); if (!c) break;
-      const t = (c.tasks || []).find(x => x.id === el.getAttribute("data-tid"));
-      if (t) { t.done = !t.done; t.doneAt = t.done ? new Date().toISOString() : ""; upsertCase(c); render(); }
+      const tid = el.getAttribute("data-tid");
+      const c = id ? getCase(id) : null;
+      const arr = c ? (c.tasks || []) : (db.tasks || []);
+      const t = arr.find(x => x.id === tid);
+      if (t) {
+        t.done = !t.done;
+        t.doneAt = t.done ? new Date().toISOString() : "";
+        if (c) upsertCase(c); else save();
+        render();
+      }
       break;
     }
     case "del-task": {
-      const c = getCase(id); if (!c) break;
       if (!confirm("Delete this task?")) break;
-      c.tasks = (c.tasks || []).filter(x => x.id !== el.getAttribute("data-tid"));
-      upsertCase(c); render(); break;
+      const tid = el.getAttribute("data-tid");
+      if (id) {
+        const c = getCase(id); if (!c) break;
+        c.tasks = (c.tasks || []).filter(x => x.id !== tid);
+        upsertCase(c);
+      } else {
+        db.tasks = (db.tasks || []).filter(x => x.id !== tid);
+        save();
+      }
+      render(); break;
     }
     case "upload-doc": {
       const inp = document.getElementById("docFile");
